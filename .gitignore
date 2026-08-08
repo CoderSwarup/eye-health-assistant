@@ -74,6 +74,7 @@ npm-debug.log*
 *.rpm
 *.msi
 *.app
+*.spec
 
 # Logs
 *.log

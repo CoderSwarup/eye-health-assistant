@@ -152,7 +152,7 @@ PRD. Last updated: 2026-08-08
 | 3  | Release workflow              | Not started                                |
 | 4  | Documentation package         | Done — docs/ + desktop/README.md + web/README.md |
 | 5  | Smoke tests                   | Not started                                |
-| 6  | RELEASE.md                    | Not started                                |
+| 6  | RELEASE.md                    | Done — docs/release/release.md              |
 | 7  | PREREQUISITES.md              | Not started                                |
 | 8  | DEVELOPMENT.md                | Not started                                |
 | 9  | Troubleshooting documentation | Done — docs/development/troubleshooting.md |
@@ -209,9 +209,9 @@ PRD. Last updated: 2026-08-08
 | Phase 5 — Exercises   | 9      | 0      | 0           | 9           |
 | Phase 6 — Analytics   | 11     | 0      | 0           | 11          |
 | Phase 7 — Hardening   | 13     | 3      | 0           | 10          |
-| Phase 8 — Packaging   | 10     | 4      | 0           | 6           |
+| Phase 8 — Packaging   | 10     | 5      | 0           | 5           |
 | Phase 9 — Website     | 12     | 11     | 0           | 1           |
-| **Total**             | **93** | **36** | **0**       | **57**      |
+| **Total**             | **93** | **37** | **0**       | **56**      |
 
 ---
 
@@ -223,7 +223,7 @@ Use this prompt to bring any AI agent up to speed on the project.
 You are continuing work on the Eye Health Assistant project.
 
 READ THESE FILES FIRST:
-1. EYE_CARE_PRD.md — the single source of truth for all requirements
+1. docs/EYE_CARE_PRD.md — the single source of truth for all requirements
 2. AGENTS.md — coding rules, architecture, privacy rules, tech stack, styling rules
 3. docs/PROGRESS.md — this file, to see what's done and what's next
 
@@ -250,7 +250,9 @@ CURRENT STATE:
 - Phase 0-1: Complete (monorepo, app shell, docs, CI, linting, testing, packaging skeleton)
 - Phase 2: Mostly complete — dashboard, theme, navigation done; dark theme polished; all mypy errors fixed
   - Remaining: Settings page, full component library
-- Phase 3-8: Not started (Timer, Camera, Exercises, Analytics, Hardening, Packaging)
+- Phase 3-7: Not started (Timer, Camera, Exercises, Analytics, Hardening)
+- Phase 8: Partially done — docs, troubleshooting, versioning, release process, PyInstaller build working
+  - Remaining: Windows installer, macOS .dmg, release workflow, smoke tests, PREREQUISITES.md, DEVELOPMENT.md
 - Phase 9: Nearly complete — full landing page with 13 sections, design system, animations, SEO, tests
   - Remaining: Roadmap section
 
@@ -276,6 +278,7 @@ WHAT TO WORK ON NEXT (priority order):
 5. Notification system
 6. Website: Roadmap section
 7. Smart Mode (camera, blink detection, monitoring)
+8. Packaging: macOS .dmg, Windows .exe installer, release workflow
 
 PRIVACY RULES (NON-NEGOTIABLE):
 - Never persist webcam frames

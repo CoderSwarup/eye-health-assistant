@@ -103,7 +103,7 @@ eye-health-assistant/
 │   └── testing/
 ├── .github/workflows/        # CI/CD pipelines
 ├── CONTRIBUTING.md
-├── CHANGELOG.md
+├── docs/CHANGELOG.md
 ├── SECURITY.md
 ├── LICENSE
 └── Makefile

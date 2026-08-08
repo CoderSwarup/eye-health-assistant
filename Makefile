@@ -68,7 +68,7 @@ check: lint test ## Run all quality checks (lint + test)
 build: build-desktop ## Build all applications
 
 build-desktop: ## Build desktop app (PyInstaller)
-	$(PYTHON) -m PyInstaller --windowed --name EyeHealthAssistant eye_health_assistant/main.py
+	cd apps/desktop && .venv/bin/pyinstaller --windowed --name EyeHealthAssistant src/eye_health_assistant/main.py
 
 build-web: ## Build web app (Next.js)
 	cd apps/web && npm run build

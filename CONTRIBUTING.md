@@ -135,7 +135,7 @@ Use clear, descriptive commit messages:
 
 ## Documentation
 
-- Update `CHANGELOG.md` for user-facing changes
+- Update `docs/CHANGELOG.md` for user-facing changes
 - Update relevant docs in `docs/` directory
 - Add docstrings to public APIs
 - Keep README.md current
