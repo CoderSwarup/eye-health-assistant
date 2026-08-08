@@ -1,0 +1,268 @@
+[
+  {
+    "id": "exercise-gentle-blinking",
+    "slug": "gentle-blinking",
+    "title": "Gentle Blinking",
+    "short_title": "Blinking",
+    "description": "A simple exercise to restore healthy blink patterns during screen use.",
+    "purpose": "Prolonged screen focus often reduces blink rate. This exercise helps you practice full, deliberate blinks to keep your eyes comfortable.",
+    "category": "Blinking",
+    "difficulty": "Beginner",
+    "duration_seconds": 60,
+    "recommended_frequency": "Every 30 minutes during screen use",
+    "steps": [
+      {
+        "title": "Prepare",
+        "instruction": "Sit comfortably and look straight ahead. Relax your shoulders and unclench your jaw.",
+        "duration_seconds": 5
+      },
+      {
+        "title": "Full blink",
+        "instruction": "Close your eyes gently but completely. Hold for 1 second. Open slowly.",
+        "duration_seconds": 5
+      },
+      {
+        "title": "Repeat",
+        "instruction": "Blink gently 10 more times at a natural pace. Focus on fully closing your eyelids each time.",
+        "duration_seconds": 30
+      },
+      {
+        "title": "Rest",
+        "instruction": "Close your eyes and relax for a few seconds. Notice how your eyes feel.",
+        "duration_seconds": 10
+      }
+    ],
+    "safety_note": "If you feel any discomfort, stop and blink naturally. This exercise should feel comfortable.",
+    "animation": {"type": "blink"},
+    "completion_message": "Well done. Your eyes should feel more comfortable.",
+    "related_articles": ["healthy-blinking-habits"],
+    "tags": ["blinking", "quick", "dry-eyes"],
+    "content_version": "1.0",
+    "updated_at": "2026-08-08"
+  },
+  {
+    "id": "exercise-relaxed-blink",
+    "slug": "relaxed-blink-routine",
+    "title": "Relaxed Blink Routine",
+    "short_title": "Relaxed Blink",
+    "description": "A gentle blink exercise combined with relaxation to reduce eye tension.",
+    "purpose": "Combines deliberate blinking with brief relaxation to help reset your blink pattern and reduce accumulated tension.",
+    "category": "Blinking",
+    "difficulty": "Beginner",
+    "duration_seconds": 90,
+    "recommended_frequency": "Once per hour during extended screen use",
+    "steps": [
+      {
+        "title": "Settle in",
+        "instruction": "Close your eyes and take two slow, deep breaths.",
+        "duration_seconds": 10
+      },
+      {
+        "title": "Gentle blinks",
+        "instruction": "Open your eyes and blink softly 15 times. Do not squeeze — just let your eyelids meet gently.",
+        "duration_seconds": 20
+      },
+      {
+        "title": "Hold and rest",
+        "instruction": "Close your eyes again. Hold them closed gently for 5 seconds, then relax completely for 10 seconds.",
+        "duration_seconds": 20
+      },
+      {
+        "title": "Repeat cycle",
+        "instruction": "Open your eyes and blink softly 10 more times at a comfortable pace.",
+        "duration_seconds": 15
+      },
+      {
+        "title": "Final rest",
+        "instruction": "Close your eyes for a final moment and notice the difference in comfort.",
+        "duration_seconds": 10
+      }
+    ],
+    "safety_note": "Keep the blinks gentle. If your eyes feel strained, shorten the exercise.",
+    "animation": {"type": "blink"},
+    "completion_message": "Routine complete. Your blink pattern should feel more natural now.",
+    "related_articles": ["healthy-blinking-habits", "regular-screen-breaks"],
+    "tags": ["blinking", "relaxation", "comfort"],
+    "content_version": "1.0",
+    "updated_at": "2026-08-08"
+  },
+  {
+    "id": "exercise-distance-viewing",
+    "slug": "distance-viewing",
+    "title": "Look Into the Distance",
+    "short_title": "Distance View",
+    "description": "Shift your focus to a distant object to relax your eye muscles.",
+    "purpose": "Your ciliary muscles stay contracted during near-focus work. Looking at distant objects allows these muscles to relax, which can reduce eye fatigue.",
+    "category": "Distance Viewing",
+    "difficulty": "Beginner",
+    "duration_seconds": 60,
+    "recommended_frequency": "Every 20 minutes",
+    "steps": [
+      {
+        "title": "Find a target",
+        "instruction": "Look up from your screen and find an object at least 20 feet (6 meters) away — a window, a wall decoration, or anything across the room.",
+        "duration_seconds": 5
+      },
+      {
+        "title": "Focus softly",
+        "instruction": "Gaze at the distant object without straining. Let your eyes relax into the focus. Blink naturally.",
+        "duration_seconds": 25
+      },
+      {
+        "title": "Scan gently",
+        "instruction": "Slowly shift your gaze between two distant points. Move your eyes, not your head.",
+        "duration_seconds": 15
+      },
+      {
+        "title": "Return",
+        "instruction": "Look back at your screen. Notice how your eyes feel after the break.",
+        "duration_seconds": 5
+      }
+    ],
+    "safety_note": "Do not force your focus. The distant view should feel easy and comfortable.",
+    "animation": {"type": "look_away"},
+    "completion_message": "Distance viewing complete. Your eye muscles have had a chance to relax.",
+    "related_articles": ["20-20-20-rule", "screen-distance-viewing-comfort"],
+    "tags": ["distance", "focus", "relaxation"],
+    "content_version": "1.0",
+    "updated_at": "2026-08-08"
+  },
+  {
+    "id": "exercise-short-visual-rest",
+    "slug": "short-visual-rest",
+    "title": "Short Visual Rest",
+    "short_title": "Visual Rest",
+    "description": "A brief eyes-closed rest to reduce accumulated visual fatigue.",
+    "purpose": "Closing your eyes gives them a complete rest from light and focus effort. Even a short rest can help reduce feelings of visual fatigue.",
+    "category": "Eye Rest",
+    "difficulty": "Beginner",
+    "duration_seconds": 60,
+    "recommended_frequency": "Every hour or when eyes feel tired",
+    "steps": [
+      {
+        "title": "Pause",
+        "instruction": "Stop what you are doing and set aside your screen.",
+        "duration_seconds": 3
+      },
+      {
+        "title": "Close your eyes",
+        "instruction": "Close your eyes gently. Do not press on your eyelids.",
+        "duration_seconds": 5
+      },
+      {
+        "title": "Breathe and rest",
+        "instruction": "Take slow, deep breaths. Let your eyes rest in complete darkness for about 40 seconds.",
+        "duration_seconds": 40
+      },
+      {
+        "title": "Open gradually",
+        "instruction": "Open your eyes slowly. Blink a few times before returning to your screen.",
+        "duration_seconds": 7
+      }
+    ],
+    "safety_note": "If you feel uncomfortable with your eyes closed for extended periods, shorten the rest.",
+    "animation": {"type": "look_away"},
+    "completion_message": "Rest complete. Your eyes should feel refreshed.",
+    "related_articles": ["regular-screen-breaks", "digital-eye-strain"],
+    "tags": ["rest", "relaxation", "quick"],
+    "content_version": "1.0",
+    "updated_at": "2026-08-08"
+  },
+  {
+    "id": "exercise-near-to-far-focus",
+    "slug": "near-to-far-focus",
+    "title": "Near-to-Far Focus",
+    "short_title": "Near-Far Focus",
+    "description": "Alternate focusing between near and far objects to exercise your accommodation.",
+    "purpose": "Your eyes continuously adjust focus between near and far objects. This exercise practices that transition, which can help reduce focus-related fatigue.",
+    "category": "Focus Shifting",
+    "difficulty": "Intermediate",
+    "duration_seconds": 120,
+    "recommended_frequency": "Once per hour during focused work",
+    "steps": [
+      {
+        "title": "Hold your thumb out",
+        "instruction": "Extend your arm and hold your thumb about 10 inches (25 cm) from your face.",
+        "duration_seconds": 5
+      },
+      {
+        "title": "Focus near",
+        "instruction": "Focus on your thumbnail for 5 seconds. Notice the details on your thumb.",
+        "duration_seconds": 8
+      },
+      {
+        "title": "Focus far",
+        "instruction": "Shift your gaze to an object at least 20 feet away. Focus on it for 5 seconds.",
+        "duration_seconds": 8
+      },
+      {
+        "title": "Repeat cycle",
+        "instruction": "Alternate between your thumb and the distant object 8 more times. Move your eyes smoothly, without jerking.",
+        "duration_seconds": 80
+      },
+      {
+        "title": "Rest",
+        "instruction": "Lower your hand and blink gently a few times.",
+        "duration_seconds": 10
+      }
+    ],
+    "safety_note": "Move your focus smoothly between near and far. If you feel any eye strain, stop and rest.",
+    "animation": {"type": "near_far"},
+    "completion_message": "Focus shifting complete. Your accommodation muscles have been gently exercised.",
+    "related_articles": ["screen-distance-viewing-comfort", "digital-eye-strain"],
+    "tags": ["focus", "accommodation", "intermediate"],
+    "content_version": "1.0",
+    "updated_at": "2026-08-08"
+  },
+  {
+    "id": "exercise-guided-visual-break",
+    "slug": "guided-visual-break",
+    "title": "Guided Visual Break",
+    "short_title": "Visual Break",
+    "description": "A complete guided break combining distance viewing, blinking, and rest.",
+    "purpose": "This exercise combines several techniques into one short session, giving your eyes a comprehensive break from screen focus.",
+    "category": "Guided Break",
+    "difficulty": "Beginner",
+    "duration_seconds": 120,
+    "recommended_frequency": "Every 60 to 90 minutes",
+    "steps": [
+      {
+        "title": "Step away",
+        "instruction": "Push back from your desk. Roll your shoulders back once.",
+        "duration_seconds": 5
+      },
+      {
+        "title": "Distance viewing",
+        "instruction": "Look at something across the room. Hold your gaze there and blink naturally for 20 seconds.",
+        "duration_seconds": 25
+      },
+      {
+        "title": "Gentle blinks",
+        "instruction": "Close your eyes and blink softly 10 times. Keep your face relaxed.",
+        "duration_seconds": 15
+      },
+      {
+        "title": "Eye movement",
+        "instruction": "Open your eyes and slowly look up, then down, then left, then right. Move gently without straining.",
+        "duration_seconds": 15
+      },
+      {
+        "title": "Final rest",
+        "instruction": "Close your eyes for 15 seconds. Breathe naturally.",
+        "duration_seconds": 20
+      },
+      {
+        "title": "Return",
+        "instruction": "Open your eyes. You are ready to continue.",
+        "duration_seconds": 5
+      }
+    ],
+    "safety_note": "Move your eyes gently throughout. Never force a stretch or push through discomfort.",
+    "animation": {"type": "look_away"},
+    "completion_message": "Break complete. Your eyes have rested and reset.",
+    "related_articles": ["20-20-20-rule", "regular-screen-breaks", "building-focus-sessions"],
+    "tags": ["comprehensive", "break", "multi-step"],
+    "content_version": "1.0",
+    "updated_at": "2026-08-08"
+  }
+]

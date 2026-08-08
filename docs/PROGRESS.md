@@ -41,7 +41,7 @@ PRD. Last updated: 2026-08-08
 | 2 | Theme system (light, dark, system)                  | Done — all mypy errors fixed |
 | 3 | Dashboard (metrics, monitoring card, quick actions) | Done — dark theme polished |
 | 4 | Settings page                                       | Done — full page with 5 sections     |
-| 5 | Reusable component library                          | Partial — MetricCard only  |
+| 5 | Reusable component library                          | Done — 6 widgets           |
 | 6 | Design system (typography, spacing)                 | Done — tokens + spacing    |
 
 **Desktop fixes completed this session:**
@@ -93,15 +93,15 @@ PRD. Last updated: 2026-08-08
 
 | # | Deliverable                | Status      |
 | - | -------------------------- | ----------- |
-| 1 | Exercise catalog           | Not started |
-| 2 | Exercise card UI           | Not started |
-| 3 | Exercise detail screen     | Not started |
-| 4 | Exercise animations        | Not started |
-| 5 | Exercise content (JSON)    | Not started |
-| 6 | Eye Care / Learning Center | Not started |
-| 7 | Eye Care detail screen     | Not started |
-| 8 | Eye Care content (JSON)    | Not started |
-| 9 | Content loader             | Not started |
+| 1 | Exercise catalog           | Done — 6 exercises          |
+| 2 | Exercise card UI           | Done — ExerciseCard widget  |
+| 3 | Exercise detail screen     | Done — ExerciseDetailPage    |
+| 4 | Exercise animations        | Not started                 |
+| 5 | Exercise content (JSON)    | Done — content/exercises/   |
+| 6 | Eye Care / Learning Center | Done — 8 articles           |
+| 7 | Eye Care detail screen     | Done — ArticleDetailPage     |
+| 8 | Eye Care content (JSON)    | Done — content/eye_care/    |
+| 9 | Content loader             | Done — content/loader.py + validation |
 
 ---
 
@@ -109,17 +109,17 @@ PRD. Last updated: 2026-08-08
 
 | #  | Deliverable        | Status      |
 | -- | ------------------ | ----------- |
-| 1  | Daily statistics   | Not started |
-| 2  | Weekly statistics  | Not started |
-| 3  | Monthly statistics | Not started |
-| 4  | Charts             | Not started |
-| 5  | Statistics engine  | Not started |
-| 6  | Insights engine    | Not started |
-| 7  | Score calculation  | Not started |
-| 8  | Historical views   | Not started |
-| 9  | Data export        | Not started |
-| 10 | Data deletion      | Not started |
-| 11 | Product metrics    | Not started |
+| 1  | Daily statistics   | Done — StatisticsPage       |
+| 2  | Weekly statistics  | Done — period toggle        |
+| 3  | Monthly statistics | Done — period toggle        |
+| 4  | Charts             | Not started — needs engine  |
+| 5  | Statistics engine  | Not started                 |
+| 6  | Insights engine    | Not started                 |
+| 7  | Score calculation  | Not started                 |
+| 8  | Historical views   | Done — HistoryPage          |
+| 9  | Data export        | Button only — no impl       |
+| 10 | Data deletion      | Button only — no impl       |
+| 11 | Product metrics    | Not started                 |
 
 ---
 
@@ -203,15 +203,15 @@ PRD. Last updated: 2026-08-08
 | --------------------- | ------ | ------ | ----------- | ----------- |
 | Phase 0 — Planning    | 5      | 5      | 0           | 0           |
 | Phase 1 — Foundation  | 9      | 9      | 0           | 0           |
-| Phase 2 — Desktop UI  | 6      | 5      | 0           | 1           |
+| Phase 2 — Desktop UI  | 6      | 6      | 0           | 0           |
 | Phase 3 — Timer Mode  | 8      | 0      | 0           | 8           |
 | Phase 4 — Camera Mode | 11     | 0      | 0           | 11          |
-| Phase 5 — Exercises   | 9      | 0      | 0           | 9           |
-| Phase 6 — Analytics   | 11     | 0      | 0           | 11          |
+| Phase 5 — Exercises   | 9      | 8      | 0           | 1           |
+| Phase 6 — Analytics   | 11     | 4      | 0           | 7           |
 | Phase 7 — Hardening   | 13     | 3      | 0           | 10          |
 | Phase 8 — Packaging   | 10     | 5      | 0           | 5           |
 | Phase 9 — Website     | 12     | 11     | 0           | 1           |
-| **Total**             | **93** | **38** | **0**       | **55**      |
+| **Total**             | **93** | **51** | **0**       | **42**      |
 
 ---
 
@@ -248,11 +248,17 @@ TECH STACK (DO NOT CHANGE):
 
 CURRENT STATE:
 - Phase 0-1: Complete (monorepo, app shell, docs, CI, linting, testing, packaging skeleton)
-- Phase 2: Mostly complete — dashboard, theme, navigation, settings done; dark theme polished; all mypy errors fixed
-  - Remaining: full component library
-- Phase 3-7: Not started (Timer, Camera, Exercises, Analytics, Hardening)
+- Phase 2: Complete — dashboard, theme, navigation, settings, 6 reusable widgets, design system
+- Phase 3: Not started (Timer mode)
+- Phase 4: Not started (Camera/Smart Mode)
+- Phase 5: Partially done — exercises catalog, exercise cards, eye care articles done
+  - Remaining: exercise detail, eye care detail, JSON content, animations, content loader
+- Phase 6: Partially done — statistics page, history page, period toggles done
+  - Remaining: charts engine, statistics engine, insights, score calculation, export/delete
+- Phase 7: Partially done — Result type, exceptions, logging, UI states for all screens
+  - Remaining: accessibility, performance, database migrations, privacy/security review, system tray
 - Phase 8: Partially done — docs, troubleshooting, versioning, release process, PyInstaller build working
-  - Remaining: Windows installer, macOS .dmg, release workflow, smoke tests, PREREQUISITES.md, DEVELOPMENT.md
+  - Remaining: Windows installer, macOS .dmg, release workflow, smoke tests
 - Phase 9: Nearly complete — full landing page with 13 sections, design system, animations, SEO, tests
   - Remaining: Roadmap section
 
@@ -271,10 +277,10 @@ WEB STYLING RULES (CRITICAL):
 5. Inter font via next/font/google
 
 WHAT TO WORK ON NEXT (priority order):
-1. Desktop: Remaining dashboard pages (exercises, eye care, statistics, history)
+1. Timer mode (engine, presets, scheduler, break flow)
 2. SQLite database layer (SQLAlchemy models, repositories)
-3. Timer mode (engine, presets, scheduler, break flow)
-4. Notification system
+3. Notification system
+4. Exercise/Eye Care detail screens and JSON content
 5. Website: Roadmap section
 6. Smart Mode (camera, blink detection, monitoring)
 7. Packaging: macOS .dmg, Windows .exe installer, release workflow
