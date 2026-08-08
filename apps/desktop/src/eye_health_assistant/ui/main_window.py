@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (
 
 from eye_health_assistant.app.dependencies import Dependencies
 from eye_health_assistant.ui.pages.dashboard import DashboardPage
+from eye_health_assistant.ui.pages.settings import SettingsPage
 from eye_health_assistant.ui.themes.manager import ThemeManager, ThemeMode
 
 logger = logging.getLogger(__name__)
@@ -126,6 +127,7 @@ class MainWindow(QMainWindow):
     def _create_pages(self) -> None:
         """Create all page instances."""
         self.pages["dashboard"] = DashboardPage(deps=self.deps)
+        self.pages["settings"] = SettingsPage(deps=self.deps)
 
     def _navigate_to(self, page_id: str) -> None:
         """Navigate to a page by ID."""

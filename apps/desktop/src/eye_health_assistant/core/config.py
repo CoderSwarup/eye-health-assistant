@@ -36,6 +36,19 @@ class Config:
     theme: str = "system"
     language: str = "en"
 
+    # Timer defaults
+    focus_duration: int = 1200  # 20 minutes in seconds
+    break_duration: int = 20  # 20 seconds
+    long_break_duration: int = 300  # 5 minutes in seconds
+
+    # Notifications
+    notifications_enabled: bool = True
+    min_notification_interval: int = 300  # 5 minutes in seconds
+
+    # Smart mode (camera)
+    blink_rate_threshold: float = 15.0  # blinks per minute
+    rolling_window_minutes: int = 3
+
     def __post_init__(self) -> None:
         if self.database_path is None:
             self.database_path = self.app_data_dir / "database" / "app.sqlite"

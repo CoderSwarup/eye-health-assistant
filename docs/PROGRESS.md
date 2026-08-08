@@ -40,7 +40,7 @@ PRD. Last updated: 2026-08-08
 | 1 | Navigation system (sidebar)                         | Done                       |
 | 2 | Theme system (light, dark, system)                  | Done — all mypy errors fixed |
 | 3 | Dashboard (metrics, monitoring card, quick actions) | Done — dark theme polished |
-| 4 | Settings page                                       | Not started                |
+| 4 | Settings page                                       | Done — full page with 5 sections     |
 | 5 | Reusable component library                          | Partial — MetricCard only  |
 | 6 | Design system (typography, spacing)                 | Done — tokens + spacing    |
 
@@ -203,7 +203,7 @@ PRD. Last updated: 2026-08-08
 | --------------------- | ------ | ------ | ----------- | ----------- |
 | Phase 0 — Planning    | 5      | 5      | 0           | 0           |
 | Phase 1 — Foundation  | 9      | 9      | 0           | 0           |
-| Phase 2 — Desktop UI  | 6      | 4      | 0           | 2           |
+| Phase 2 — Desktop UI  | 6      | 5      | 0           | 1           |
 | Phase 3 — Timer Mode  | 8      | 0      | 0           | 8           |
 | Phase 4 — Camera Mode | 11     | 0      | 0           | 11          |
 | Phase 5 — Exercises   | 9      | 0      | 0           | 9           |
@@ -211,7 +211,7 @@ PRD. Last updated: 2026-08-08
 | Phase 7 — Hardening   | 13     | 3      | 0           | 10          |
 | Phase 8 — Packaging   | 10     | 5      | 0           | 5           |
 | Phase 9 — Website     | 12     | 11     | 0           | 1           |
-| **Total**             | **93** | **37** | **0**       | **56**      |
+| **Total**             | **93** | **38** | **0**       | **55**      |
 
 ---
 
@@ -248,8 +248,8 @@ TECH STACK (DO NOT CHANGE):
 
 CURRENT STATE:
 - Phase 0-1: Complete (monorepo, app shell, docs, CI, linting, testing, packaging skeleton)
-- Phase 2: Mostly complete — dashboard, theme, navigation done; dark theme polished; all mypy errors fixed
-  - Remaining: Settings page, full component library
+- Phase 2: Mostly complete — dashboard, theme, navigation, settings done; dark theme polished; all mypy errors fixed
+  - Remaining: full component library
 - Phase 3-7: Not started (Timer, Camera, Exercises, Analytics, Hardening)
 - Phase 8: Partially done — docs, troubleshooting, versioning, release process, PyInstaller build working
   - Remaining: Windows installer, macOS .dmg, release workflow, smoke tests, PREREQUISITES.md, DEVELOPMENT.md
@@ -271,14 +271,13 @@ WEB STYLING RULES (CRITICAL):
 5. Inter font via next/font/google
 
 WHAT TO WORK ON NEXT (priority order):
-1. Desktop: Settings page
-2. Desktop: Remaining dashboard pages (exercises, eye care, statistics, history)
-3. SQLite database layer (SQLAlchemy models, repositories)
-4. Timer mode (engine, presets, scheduler, break flow)
-5. Notification system
-6. Website: Roadmap section
-7. Smart Mode (camera, blink detection, monitoring)
-8. Packaging: macOS .dmg, Windows .exe installer, release workflow
+1. Desktop: Remaining dashboard pages (exercises, eye care, statistics, history)
+2. SQLite database layer (SQLAlchemy models, repositories)
+3. Timer mode (engine, presets, scheduler, break flow)
+4. Notification system
+5. Website: Roadmap section
+6. Smart Mode (camera, blink detection, monitoring)
+7. Packaging: macOS .dmg, Windows .exe installer, release workflow
 
 PRIVACY RULES (NON-NEGOTIABLE):
 - Never persist webcam frames
@@ -306,6 +305,15 @@ DO NOT:
 - Put borders on global QWidget rule (desktop)
 - Use CSS-only fonts like -apple-system (desktop)
 - Forget to import globals.css in layout.tsx (web)
+
+WORKFLOW RULE — Plan First, Then Implement:
+Before starting ANY task:
+1. Tell the user what you plan to do — list the files, changes, and approach
+2. Get approval or answer questions
+3. Then implement all changes cleanly
+4. Run quality checks (ruff, mypy, pytest, eslint, vitest)
+5. Update docs/PROGRESS.md
+Never jump straight into coding without explaining the plan first.
 
 IMPORTANT RULE — Update Progress After Every Change:
 After completing ANY work (new feature, bug fix, refactor, etc.):
