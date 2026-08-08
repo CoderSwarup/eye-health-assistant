@@ -1,0 +1,126 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eye-health-assistant"
+version = "0.1.0"
+description = "A privacy-first desktop application for healthier screen-use habits"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.12"
+authors = [
+    {name = "Eye Health Assistant Contributors"},
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Multimedia :: Graphics :: Capture",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "PySide6>=6.6.0",
+    "numpy>=1.24.0",
+    "sqlalchemy>=2.0.0",
+]
+
+[project.optional-dependencies]
+camera = [
+    "opencv-python>=4.8.0",
+    "mediapipe>=0.10.0",
+]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "mypy>=1.7.0",
+    "ruff>=0.1.0",
+    "pre-commit>=3.6.0",
+]
+
+[project.scripts]
+eye-health-assistant = "eye_health_assistant.main:main"
+
+[project.gui-scripts]
+eye-health-assistant = "eye_health_assistant.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+eye_health_assistant = [
+    "resources/**/*",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+src = ["src"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "ARG",  # flake8-unused-arguments
+    "RUF",  # ruff-specific rules
+]
+ignore = [
+    "TC001",  # Move application import into type-checking block
+    "TC003",  # Move stdlib import into type-checking block
+    "UP046",  # Use type parameters instead of Generic subclass
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["eye_health_assistant"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/eye_health_assistant/core/result.py" = ["ARG002"]  # Unused argument in Ok.unwrap_or (API pattern)
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = [
+    "mediapipe.*",
+    "cv2.*",
+    "numpy.*",
+    "PySide6.*",
+    "sqlalchemy.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks integration tests",
+    "e2e: marks end-to-end tests",
+]

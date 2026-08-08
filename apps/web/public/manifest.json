@@ -1,0 +1,9 @@
+{
+  "name": "Eye Health Assistant",
+  "short_name": "Eye Health",
+  "description": "Privacy-first screen wellness application",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#2563EB",
+  "background_color": "#FFFFFF"
+}
