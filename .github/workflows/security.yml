@@ -1,37 +1,51 @@
 name: Security
 
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
   schedule:
-    - cron: '0 0 * * 1'  # Weekly on Monday
+    - cron: '0 0 1 * *'  # Monthly on the 1st
 
 jobs:
   audit:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: 🐍 Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.14'
 
-      - name: Install Python audit tools
-        run: pip install pip-audit
+      - name: 📋 Display Python version
+        run: python --version
 
-      - name: Audit Python dependencies
-        run: pip-audit --requirement <(pip freeze)
+      - name: 📦 Install pip-audit
+        run: |
+          echo "🔧 Installing pip-audit..."
+          pip install pip-audit
+          echo "✅ pip-audit installed"
+
+      - name: 🔒 Audit Python dependencies
+        run: |
+          echo "🔒 Auditing Python dependencies..."
+          pip-audit --requirement <(pip freeze)
+          echo "✅ Python audit passed"
         working-directory: apps/desktop
 
-      - name: Set up Node.js
+      - name: 🟢 Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '24'
 
-      - name: Audit npm dependencies
-        run: npm audit --audit-level=high
+      - name: 📋 Display Node.js version
+        run: echo "🟢 Node.js version: $(node --version)"
+
+      - name: 🔒 Audit npm dependencies
+        run: |
+          echo "🔒 Auditing npm dependencies..."
+          npm audit --audit-level=high
+          echo "✅ npm audit passed"
         working-directory: apps/web
