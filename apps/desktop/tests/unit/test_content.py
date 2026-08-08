@@ -2,10 +2,7 @@
 
 from __future__ import annotations
 
-import pytest
-
 from eye_health_assistant.content.loader import (
-    ContentError,
     get_article_by_slug,
     get_article_categories,
     get_articles_by_category,
@@ -21,10 +18,8 @@ from eye_health_assistant.content.validation import (
     validate_article,
     validate_articles,
     validate_exercise,
-    validate_exercises,
 )
 from eye_health_assistant.core.result import Err, Ok
-
 
 # --- Validation tests ---
 

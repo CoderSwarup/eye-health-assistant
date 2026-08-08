@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
     QFrame,
     QGridLayout,
@@ -50,6 +51,8 @@ class MetricCard(QFrame):
 
 class DashboardPage(QWidget):
     """Main dashboard showing overview metrics, monitoring status, and quick actions."""
+
+    navigate_to = Signal(str)
 
     def __init__(self, deps: Dependencies, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -100,17 +103,20 @@ class DashboardPage(QWidget):
         actions_layout.setSpacing(10)
 
         actions = [
-            ("Start Timer", True),
-            ("Start Smart Mode", True),
-            ("Exercises", False),
-            ("Eye Care", False),
-            ("Statistics", False),
+            ("Start Timer", True, "monitoring"),
+            ("Start Smart Mode", True, "monitoring"),
+            ("Exercises", False, "exercises"),
+            ("Eye Care", False, "eye_care"),
+            ("Statistics", False, "statistics"),
         ]
 
-        for label, primary in actions:
+        for label, primary, target in actions:
             btn = QPushButton(label)
             if not primary:
                 btn.setObjectName("secondary-button")
+            btn.clicked.connect(
+                lambda t=target: self.navigate_to.emit(t)
+            )
             actions_layout.addWidget(btn)
 
         actions_layout.addStretch()

@@ -60,14 +60,28 @@ PRD. Last updated: 2026-08-08
 
 | # | Deliverable           | Status      |
 | - | --------------------- | ----------- |
-| 1 | Timer engine          | Not started |
-| 2 | Timer presets         | Not started |
-| 3 | Timer scheduler       | Not started |
-| 4 | Break flow            | Not started |
-| 5 | Notification system   | Not started |
-| 6 | History               | Not started |
-| 7 | SQLite database layer | Not started |
+| 1 | Timer engine          | Done — state machine with clock abstraction |
+| 2 | Timer presets         | Done — focus/break/long break configurable |
+| 3 | Timer scheduler       | Done — auto-transition between phases |
+| 4 | Break flow            | Done — auto-continue after break |
+| 5 | Notification system   | Done — desktop notifications via QSystemTrayIcon |
+| 6 | History               | Done — database-backed session log |
+| 7 | SQLite database layer | Done — SQLAlchemy ORM with migrations |
 | 8 | Onboarding flow       | Not started |
+
+**Timer mode completed this session:**
+- Domain models: `TimerPhase`, `SessionStatus`, `SessionMode` enums, `TimerSession` dataclass
+- Database layer: `TimerSessionRow` ORM, `Database` engine, `SessionRepository` with CRUD
+- Timer engine: `TimerEngine` state machine with `FakeClock` for testing
+- Timer controller: `TimerController` Qt-integrated with signals for UI updates
+- Notification service: `NotificationService` with desktop notifications
+- DI wiring: `Dependencies` container initializes database, repository, services
+- Monitoring page: `MonitoringPage` UI with timer display, controls, progress
+- Dashboard wiring: Quick action buttons navigate to monitoring page
+- History page: Database-backed session list with empty state
+- Statistics page: Dynamic metrics from database with summary cards
+- Tests: 18 new tests (11 engine, 7 repository), all passing
+- Quality: ruff clean, mypy clean, 80/80 tests passing
 
 ---
 
@@ -249,7 +263,7 @@ TECH STACK (DO NOT CHANGE):
 CURRENT STATE:
 - Phase 0-1: Complete (monorepo, app shell, docs, CI, linting, testing, packaging skeleton)
 - Phase 2: Complete — dashboard, theme, navigation, settings, 6 reusable widgets, design system
-- Phase 3: Not started (Timer mode)
+- Phase 3: Complete — timer engine, state machine, database layer, notifications, monitoring UI
 - Phase 4: Not started (Camera/Smart Mode)
 - Phase 5: Partially done — exercises catalog, exercise cards, eye care articles done
   - Remaining: exercise detail, eye care detail, JSON content, animations, content loader
@@ -277,13 +291,12 @@ WEB STYLING RULES (CRITICAL):
 5. Inter font via next/font/google
 
 WHAT TO WORK ON NEXT (priority order):
-1. Timer mode (engine, presets, scheduler, break flow)
-2. SQLite database layer (SQLAlchemy models, repositories)
-3. Notification system
-4. Exercise/Eye Care detail screens and JSON content
-5. Website: Roadmap section
-6. Smart Mode (camera, blink detection, monitoring)
-7. Packaging: macOS .dmg, Windows .exe installer, release workflow
+1. Smart Mode (camera, blink detection, monitoring)
+2. Exercise/Eye Care detail screens and JSON content
+3. Website: Roadmap section
+4. Charts engine and statistics engine
+5. Database migrations
+6. Packaging: macOS .dmg, Windows .exe installer, release workflow
 
 PRIVACY RULES (NON-NEGOTIABLE):
 - Never persist webcam frames

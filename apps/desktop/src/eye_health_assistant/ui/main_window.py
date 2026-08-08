@@ -19,6 +19,7 @@ from eye_health_assistant.ui.pages.dashboard import DashboardPage
 from eye_health_assistant.ui.pages.exercises import ExercisesPage
 from eye_health_assistant.ui.pages.eye_care import EyeCarePage
 from eye_health_assistant.ui.pages.history import HistoryPage
+from eye_health_assistant.ui.pages.monitoring import MonitoringPage
 from eye_health_assistant.ui.pages.settings import SettingsPage
 from eye_health_assistant.ui.pages.statistics import StatisticsPage
 from eye_health_assistant.ui.themes.manager import ThemeManager, ThemeMode
@@ -131,6 +132,15 @@ class MainWindow(QMainWindow):
     def _create_pages(self) -> None:
         """Create all page instances."""
         self.pages["dashboard"] = DashboardPage(deps=self.deps)
+        dashboard = self.pages["dashboard"]
+        dashboard.navigate_to.connect(self._navigate_to)  # type: ignore[attr-defined]
+
+        if self.deps.timer_controller:
+            monitoring = MonitoringPage(
+                timer_controller=self.deps.timer_controller
+            )
+            self.pages["monitoring"] = monitoring
+
         self.pages["exercises"] = ExercisesPage(deps=self.deps)
         self.pages["eye_care"] = EyeCarePage(deps=self.deps)
         self.pages["statistics"] = StatisticsPage(deps=self.deps)

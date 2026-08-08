@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
 )
 
 from eye_health_assistant.app.dependencies import Dependencies
+from eye_health_assistant.domain.models.timer_session import TimerSession
 
 
 class SessionCard(QFrame):
@@ -20,10 +21,7 @@ class SessionCard(QFrame):
 
     def __init__(
         self,
-        session_type: str,
-        duration: str,
-        date: str,
-        details: str,
+        session: TimerSession,
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
@@ -42,12 +40,16 @@ class SessionCard(QFrame):
         header_row = QHBoxLayout()
         header_row.setSpacing(12)
 
-        type_label = QLabel(session_type)
-        type_label.setObjectName("section-title")
-        header_row.addWidget(type_label)
+        mode_label = QLabel(session.mode.value.title())
+        mode_label.setObjectName("section-title")
+        header_row.addWidget(mode_label)
         header_row.addStretch()
 
-        date_label = QLabel(date)
+        if session.started_at:
+            date_str = session.started_at.strftime("%Y-%m-%d %H:%M")
+        else:
+            date_str = "Unknown"
+        date_label = QLabel(date_str)
         date_label.setObjectName("caption")
         header_row.addWidget(date_label)
 
@@ -56,13 +58,16 @@ class SessionCard(QFrame):
         detail_row = QHBoxLayout()
         detail_row.setSpacing(16)
 
-        duration_label = QLabel(f"Duration: {duration}")
+        duration_min = session.focus_duration // 60
+        duration_label = QLabel(f"Duration: {duration_min} min")
         duration_label.setObjectName("subtitle")
         detail_row.addWidget(duration_label)
 
-        details_label = QLabel(details)
-        details_label.setObjectName("caption")
-        detail_row.addWidget(details_label)
+        sessions_label = QLabel(
+            f"Focus sessions: {session.completed_focus_sessions}"
+        )
+        sessions_label.setObjectName("caption")
+        detail_row.addWidget(sessions_label)
 
         detail_row.addStretch()
         info_layout.addLayout(detail_row)
@@ -80,7 +85,10 @@ class HistoryPage(QWidget):
     def __init__(self, deps: Dependencies, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self.deps = deps
+        self._session_list_layout: QVBoxLayout | None = None
+        self._empty_state: QFrame | None = None
         self._build_ui()
+        self._load_sessions()
 
     def _build_ui(self) -> None:
         layout = QVBoxLayout(self)
@@ -103,11 +111,21 @@ class HistoryPage(QWidget):
         subtitle.setObjectName("subtitle")
         layout.addWidget(subtitle)
 
-        empty_state = QFrame()
-        empty_state.setObjectName("card")
-        empty_state.setFrameShape(QFrame.Shape.NoFrame)
+        # Session list container
+        self._session_list = QFrame()
+        self._session_list.setObjectName("card")
+        self._session_list.setFrameShape(QFrame.Shape.NoFrame)
+        self._session_list_layout = QVBoxLayout(self._session_list)
+        self._session_list_layout.setContentsMargins(0, 0, 0, 0)
+        self._session_list_layout.setSpacing(8)
+        layout.addWidget(self._session_list)
 
-        empty_layout = QVBoxLayout(empty_state)
+        # Empty state
+        self._empty_state = QFrame()
+        self._empty_state.setObjectName("card")
+        self._empty_state.setFrameShape(QFrame.Shape.NoFrame)
+
+        empty_layout = QVBoxLayout(self._empty_state)
         empty_layout.setContentsMargins(0, 0, 0, 0)
         empty_layout.setSpacing(8)
 
@@ -123,6 +141,38 @@ class HistoryPage(QWidget):
         empty_msg.setWordWrap(True)
         empty_layout.addWidget(empty_msg)
 
-        layout.addWidget(empty_state)
+        layout.addWidget(self._empty_state)
 
         layout.addStretch()
+
+    def _load_sessions(self) -> None:
+        """Load sessions from the database."""
+        if self.deps.session_repository is None:
+            return
+
+        sessions = self.deps.session_repository.get_recent(limit=50)
+
+        # Clear existing cards
+        if self._session_list_layout:
+            while self._session_list_layout.count():
+                item = self._session_list_layout.takeAt(0)
+                if item is not None:
+                    widget = item.widget()
+                    if widget is not None:
+                        widget.setParent(None)
+
+        if sessions:
+            if self._session_list:
+                self._session_list.show()
+            if self._empty_state:
+                self._empty_state.hide()
+
+            if self._session_list_layout:
+                for session in sessions:
+                    card = SessionCard(session)
+                    self._session_list_layout.addWidget(card)
+        else:
+            if self._session_list:
+                self._session_list.hide()
+            if self._empty_state:
+                self._empty_state.show()

@@ -1,3 +1,17 @@
 """Timer engine and scheduling."""
 
-__all__: list[str] = []
+from eye_health_assistant.timer.controller import TimerController
+from eye_health_assistant.timer.engine import (
+    Clock,
+    FakeClock,
+    MonotonicClock,
+    TimerEngine,
+)
+
+__all__ = [
+    "Clock",
+    "FakeClock",
+    "MonotonicClock",
+    "TimerController",
+    "TimerEngine",
+]
