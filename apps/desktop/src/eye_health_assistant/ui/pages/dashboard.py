@@ -90,6 +90,24 @@ class DashboardPage(QWidget):
 
         layout.addLayout(header)
 
+        # Database warning banner
+        if not self.deps.db_available:
+            db_warning = QFrame()
+            db_warning.setObjectName("card")
+            db_warning.setFrameShape(QFrame.Shape.NoFrame)
+            warning_layout = QHBoxLayout(db_warning)
+            warning_layout.setContentsMargins(16, 12, 16, 12)
+            warning_icon = QLabel("⚠")
+            warning_layout.addWidget(warning_icon)
+            warning_text = QLabel(
+                "Database unavailable — history and statistics are disabled. "
+                f"Error: {self.deps.db_error or 'unknown'}"
+            )
+            warning_text.setObjectName("subtitle")
+            warning_text.setWordWrap(True)
+            warning_layout.addWidget(warning_text, 1)
+            layout.addWidget(db_warning)
+
         # Overview metrics row
         metrics_layout = QGridLayout()
         metrics_layout.setSpacing(16)

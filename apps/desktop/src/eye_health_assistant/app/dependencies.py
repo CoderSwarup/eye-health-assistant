@@ -44,6 +44,18 @@ class Dependencies:
     monitoring_service: MonitoringService | None = None
     analytics_service: AnalyticsService | None = None
 
+    @property
+    def db_available(self) -> bool:
+        """Whether the database is available for operations."""
+        return self.lifecycle is not None and self.lifecycle.database is not None
+
+    @property
+    def db_error(self) -> str | None:
+        """Database error message if unavailable."""
+        if self.lifecycle is not None:
+            return self.lifecycle.database_error
+        return None
+
     def initialize(self, parent: QObject | None = None) -> None:
         """Initialize all dependencies."""
         # Load config from file (falls back to defaults on error)

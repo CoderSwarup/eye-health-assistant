@@ -26,6 +26,7 @@ from eye_health_assistant.ui.charts import (
     LineChartWidget,
     SummaryCard,
 )
+from eye_health_assistant.ui.widgets.states import EmptyState
 
 
 class StatisticsPage(QWidget):
@@ -287,6 +288,7 @@ class StatisticsPage(QWidget):
 
     def _show_placeholder_stats(self) -> None:
         """Show placeholder stats when no service is available."""
+        # Clear existing cards
         while self._summary_container.count():
             item = self._summary_container.takeAt(0)
             if item is not None:
@@ -294,16 +296,25 @@ class StatisticsPage(QWidget):
                 if widget is not None:
                     widget.setParent(None)
 
-        placeholders = [
-            ("Focus Time", "--", "No data"),
-            ("Break Time", "--", "No data"),
-            ("Breaks Completed", "--", "No data"),
-            ("Smart Monitoring", "--", "No data"),
-            ("Estimated Blink Rate", "--", "No data"),
-        ]
-        for title, value, subtitle in placeholders:
-            card = SummaryCard(title, value, subtitle)
-            self._summary_container.addWidget(card)
+        # Show empty state in summary area
+        empty = EmptyState(
+            message="No Statistics Yet",
+            description=(
+                "Start a focus session or enable Smart Mode to begin "
+                "tracking your screen time and eye health metrics."
+            ),
+            action_label="Go to Monitoring",
+        )
+        empty.action_clicked.connect(lambda: self._navigate_to("monitoring"))
+        self._summary_container.addWidget(empty)
+
+    def _navigate_to(self, page_id: str) -> None:
+        """Navigate to another page."""
+        parent = self.parent()
+        if parent is not None:
+            main_window = parent.parent()
+            if main_window is not None and hasattr(main_window, "_navigate_to"):
+                main_window._navigate_to(page_id)
 
     def _on_export(self) -> None:
         """Export all data as JSON."""

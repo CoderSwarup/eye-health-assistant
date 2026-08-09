@@ -243,6 +243,12 @@ def generate_stylesheet(colors: ThemeColors) -> str:
         font-weight: 500;
     }}
 
+    #nav-button:focus {{
+        outline: none;
+        border: 2px solid {colors.border_focus};
+        padding: 9px 14px;
+    }}
+
     /* === Cards === */
     #card {{
         background-color: {colors.card_bg};
@@ -288,6 +294,11 @@ def generate_stylesheet(colors: ThemeColors) -> str:
     QPushButton:disabled {{
         background-color: {colors.background_tertiary};
         color: {colors.text_tertiary};
+    }}
+
+    QPushButton:focus {{
+        outline: none;
+        border: 2px solid {colors.border_focus};
     }}
 
     #secondary-button {{

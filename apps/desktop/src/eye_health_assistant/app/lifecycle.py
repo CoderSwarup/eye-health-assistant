@@ -19,6 +19,7 @@ class ApplicationLifecycle:
         self.config = config
         self._initialized = False
         self.database: Database | None = None
+        self.database_error: str | None = None
 
     def initialize(self) -> None:
         """Initialize application components."""
@@ -34,14 +35,14 @@ class ApplicationLifecycle:
         # Ensure directories exist
         self._ensure_directories()
 
-        # Initialize database using config path
+        # Initialize database using config path (non-fatal on error)
         self._init_database()
 
         self._initialized = True
         logger.info("Application initialized successfully")
 
     def _init_database(self) -> None:
-        """Initialize the SQLite database."""
+        """Initialize the SQLite database. Degraded mode on failure."""
         db_path = self.config.database_path
         if db_path is None:
             db_path = self.config.app_data_dir / "database" / "app.sqlite"
@@ -54,8 +55,13 @@ class ApplicationLifecycle:
             self.database.initialize()
             logger.info("Database initialized at %s", db_path)
         except Exception as e:
-            logger.critical("Failed to initialize database: %s", e)
-            raise
+            self.database = None
+            self.database_error = str(e)
+            logger.error(
+                "Database initialization failed: %s. "
+                "Running in degraded mode (no history/stats).",
+                e,
+            )
 
     def _ensure_directories(self) -> None:
         """Ensure required application directories exist."""

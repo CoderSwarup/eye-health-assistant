@@ -1,145 +1,169 @@
 # Contributing to Eye Health Assistant
 
-Thank you for your interest in contributing to Eye Health Assistant! This document provides guidelines and information for contributors.
-
-## Code of Conduct
-
-Please be respectful and constructive in all interactions. We are building a privacy-first wellness tool and should treat our users and each other with care.
+Thank you for your interest in contributing! This document provides guidelines for contributing to this project.
 
 ## Getting Started
 
 ### Prerequisites
 
-- Python 3.12 or later (3.14 recommended)
-- Node.js 18 or later
-- npm or yarn
-- Git
+1. Git 2.30+
+2. Python 3.12+ (for desktop app)
+3. Node.js 20+ (for web app)
+4. VS Code (recommended) with relevant extensions
 
-### Development Setup
+### Setup
 
-1. Clone the repository:
+1. Fork the repository
+2. Clone your fork:
    ```bash
-   git clone https://github.com/CoderSwarup/eye-health-assistant.git
-   cd eye-health-assistant
+   git clone git@github.com:your-username/eye-health-assistant.git
    ```
-
-2. Set up the Python desktop app:
+3. Create a feature branch:
    ```bash
-   cd apps/desktop
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   pip install -e ".[dev]"
+   git checkout -b feature/your-feature
    ```
-
-3. Set up the web app:
-   ```bash
-   cd apps/web
-   npm install
-   ```
-
-## Project Structure
-
-This is a monorepo with two main applications:
-
-- `apps/desktop` - Python desktop application (PySide6)
-- `apps/web` - Next.js landing website
-- `packages/` - Shared configuration and design tokens
-- `docs/` - Project documentation
 
 ## Development Workflow
 
-### Python Desktop App
+### Desktop App (Python + PySide6)
 
-- **Linting**: `ruff check .`
-- **Formatting**: `ruff format .`
-- **Type checking**: `mypy src/`
-- **Tests**: `pytest`
-- **Coverage**: `pytest --cov=eye_health_assistant`
-
-### Web App
-
-- **Linting**: `npm run lint`
-- **Type checking**: `npm run typecheck`
-- **Tests**: `npm test`
-- **Build**: `npm run build`
-
-### Running Quality Checks
-
-From the project root:
 ```bash
-make lint        # Run all linters
-make test        # Run all tests
-make format      # Format all code
-make check       # Run all quality checks
+cd apps/desktop
+python -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+```
+
+### Web App (Next.js)
+
+```bash
+cd apps/web
+npm install
+```
+
+## Code Standards
+
+### Python (Desktop)
+
+- **Linter**: Ruff (configured in `pyproject.toml`)
+- **Type Checker**: mypy
+- **Formatter**: Ruff format
+- **Style**: Follow PEP 8, use type hints
+
+```bash
+# Check code
+ruff check src/
+mypy src/
+
+# Format code
+ruff format src/
+```
+
+### TypeScript/React (Web)
+
+- **Linter**: ESLint 9 (flat config)
+- **Type Checker**: TypeScript strict mode
+- **Formatter**: Prettier (if configured)
+
+```bash
+# Check code
+eslint .
+
+# Type check
+tsc --noEmit
 ```
 
 ## Architecture Guidelines
 
-### Layered Architecture
-
-The desktop application uses a layered architecture:
+### Desktop Layered Architecture
 
 ```
 UI → Application → Domain → Infrastructure
 ```
 
-- **UI**: Windows, pages, widgets, dialogs, themes
+- **UI**: No business logic, no database queries
 - **Application**: Use cases, commands, queries
-- **Domain**: Business models, services, value objects
-- **Infrastructure**: Database, camera, notifications, filesystem
+- **Domain**: Models, enums, services (no UI or infrastructure)
+- **Infrastructure**: Database, camera, notifications
 
-### Key Rules
+### Web Architecture
 
-1. **No database queries in UI code**
-2. **No computer vision algorithms in UI code**
-3. **No business logic in UI widgets**
-4. **Use type hints everywhere**
-5. **Keep functions focused and small**
-6. **Prevent composition over inheritance**
-7. **Write tests for business logic**
+- **App Router**: File-based routing
+- **Components**: Reusable, composable
+- **Server Components**: Default for data fetching
+- **Client Components**: Only when interactivity needed
 
-### Privacy Rules
+## Privacy Rules (Non-Negotiable)
 
-1. **Never persist webcam frames by default**
-2. **Never upload camera data**
-3. **Never make medical or diagnostic claims**
-4. **Always use words like "estimated" for blink rate**
-5. **User data stays local**
-6. **Camera permission must be explicit**
+1. **Never persist webcam frames** — process in memory only
+2. **Never upload camera data** — all processing is local
+3. **Never make medical claims** — use "estimated", "wellness"
+4. **Camera permission must be explicit** — never silently request
+5. **User data stays local** — no cloud accounts, no telemetry
 
-## Commit Messages
+## Testing
 
-Use clear, descriptive commit messages:
+### Desktop Tests
 
-- `feat: add timer mode configuration`
-- `fix: resolve camera permission dialog issue`
-- `docs: update development setup guide`
-- `test: add blink calculation unit tests`
-- `refactor: extract notification service`
+```bash
+cd apps/desktop
+pytest tests/ -v
+```
+
+### Web Tests
+
+```bash
+cd apps/web
+npm test
+```
 
 ## Pull Request Process
 
-1. Create a feature branch from `main`
-2. Make your changes following the guidelines above
-3. Run all quality checks (`make check`)
-4. Update documentation if behavior changes
-5. Submit a pull request with a clear description
+1. **Create a feature branch** from `main`
+2. **Make your changes** following the guidelines above
+3. **Write tests** for new functionality
+4. **Update documentation** if needed
+5. **Run all checks**:
+   ```bash
+   # Desktop
+   cd apps/desktop && make check
+   
+   # Web
+   cd apps/web && npm run lint && npm test
+   ```
+6. **Commit with clear message**:
+   ```bash
+   git commit -m "feat: add new feature"
+   ```
+7. **Push and create PR**:
+   ```bash
+   git push origin feature/your-feature
+   gh pr create
+   ```
 
-## Testing Requirements
+### PR Title Convention
 
-- **Unit tests** for all business logic
-- **Integration tests** for repository and service interactions
-- **No dependency on physical cameras** in tests
-- Use mocks for camera and platform-specific code
-- Aim for meaningful coverage, not just high percentages
+- `feat:` — New feature
+- `fix:` — Bug fix
+- `docs:` — Documentation
+- `style:` — Formatting, no code change
+- `refactor:` — Code restructuring
+- `test:` — Adding tests
+- `chore:` — Maintenance
 
-## Documentation
+## Code Review
 
-- Update `docs/CHANGELOG.md` for user-facing changes
-- Update relevant docs in `docs/` directory
-- Add docstrings to public APIs
-- Keep README.md current
+All PRs require:
+1. **Passing CI** (lint, type check, tests)
+2. **Code review** from maintainer
+3. **No conflicts** with main branch
 
-## Questions?
+## Getting Help
 
-If you have questions about contributing, please open an issue or reach out to the maintainers.
+- Check existing issues and documentation
+- Open a discussion for questions
+- Review the PRD at `docs/EYE_CARE_PRD.md`
+
+## License
+
+By contributing, you agree that your contributions will be licensed under the same license as the project.

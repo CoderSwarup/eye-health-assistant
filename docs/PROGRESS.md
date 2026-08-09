@@ -57,7 +57,7 @@ PRD. Last updated: 2026-08-09
 | 5 | Notification system   | Done — desktop notifications via QSystemTrayIcon |
 | 6 | History               | Done — database-backed session log |
 | 7 | SQLite database layer | Done — SQLAlchemy ORM with migrations |
-| 8 | Onboarding flow       | Not started |
+| 8 | Onboarding flow       | Done — 5-step wizard with theme/mode selection |
 
 ---
 
@@ -122,16 +122,22 @@ PRD. Last updated: 2026-08-09
 | 1  | Error handling            | Done — consolidated exception hierarchy, Result type |
 | 2  | Accessibility             | Done — accessible names on all interactive widgets   |
 | 3  | Performance optimization  | Not started                                         |
-| 4  | Database migrations       | Not started                                         |
+| 4  | Database migrations       | Done — lightweight version-based migration system    |
 | 5  | Privacy review            | Not started                                         |
 | 6  | Security review           | Not started                                         |
-| 7  | UI states for all screens | Not started                                         |
+| 7  | UI states for all screens | Done — LoadingState, EmptyState, ErrorState widgets  |
 | 8  | Logging system            | Done — core/logging.py with RotatingFileHandler      |
 | 9  | Cross-platform isolation  | Partial — platform adapter stubs                    |
 | 10 | Local file layout         | Done — get_app_data_dir() with platform paths       |
 | 11 | System tray / menu bar    | Done — SystemTray with menu, close-to-tray          |
 | 12 | Startup behavior settings | Done — singleton instance lock, config validation   |
 | 13 | Configuration precedence  | Done — Config.from_file(), validate(), atomic save  |
+| 14 | Notification policy       | Done — rate limiting, quiet hours, per-type cooldowns |
+| 15 | Keyboard shortcuts        | Done — 1-7 page navigation, Escape to dashboard     |
+| 16 | Onboarding wizard         | Done — 5-step wizard with theme/mode selection      |
+| 17 | Camera permission dialog  | Done — permission denied dialog with settings link  |
+| 18 | Documentation files       | Done — PREREQUISITES.md, DEVELOPMENT.md, SECURITY.md, CONTRIBUTING.md |
+| 19 | Statistics empty state    | Done — EmptyState widget with action button         |
 
 ---
 
@@ -145,8 +151,8 @@ PRD. Last updated: 2026-08-09
 | 4  | Documentation package         | Done — docs/ + desktop/README.md + web/README.md |
 | 5  | Smoke tests                   | Not started                                |
 | 6  | RELEASE.md                    | Done — docs/release/release.md              |
-| 7  | PREREQUISITES.md              | Not started                                |
-| 8  | DEVELOPMENT.md                | Not started                                |
+| 7  | PREREQUISITES.md              | Done — docs/PREREQUISITES.md               |
+| 8  | DEVELOPMENT.md                | Done — docs/DEVELOPMENT.md                 |
 | 9  | Troubleshooting documentation | Done — docs/development/troubleshooting.md |
 | 10 | Semantic Versioning           | Done — pyproject.toml                      |
 
@@ -156,14 +162,14 @@ PRD. Last updated: 2026-08-09
 
 | #  | Deliverable                 | Status                                            |
 | -- | --------------------------- | ------------------------------------------------- |
-| 1  | Landing page                | Done — full page with 13 sections                 |
+| 1  | Landing page                | Done — full page with 14 sections                 |
 | 2  | Features section            | Done — 6-card grid with icons, hover effects      |
 | 3  | How It Works section        | Done — 4-step flow with connector lines           |
 | 4  | Privacy section             | Done — 4 privacy guarantees                       |
 | 5  | Download section            | Done — Mac/Windows CTAs with env-configured links |
 | 6  | FAQ section                 | Done — 10-question accordion (all PRD questions)  |
 | 7  | Documentation links         | Done — footer links to GitHub, docs, releases     |
-| 8  | Roadmap                     | Not started                                       |
+| 8  | Roadmap                     | Done — Q3 2026/Q4 2026/Q1 2027 timeline          |
 | 9  | Contact/project information | Done — footer with GitHub link                    |
 | 10 | Responsive UI               | Done — mobile-first with hamburger menu            |
 | 11 | SEO                         | Done — metadata, OG, Twitter, robots, canonical   |
@@ -178,14 +184,14 @@ PRD. Last updated: 2026-08-09
 | Phase 0 — Planning    | 5      | 5      | 0           | 0           |
 | Phase 1 — Foundation  | 9      | 9      | 0           | 0           |
 | Phase 2 — Desktop UI  | 6      | 6      | 0           | 0           |
-| Phase 3 — Timer Mode  | 8      | 7      | 0           | 1           |
+| Phase 3 — Timer Mode  | 8      | 8      | 0           | 0           |
 | Phase 4 — Camera Mode | 11     | 11     | 0           | 0           |
 | Phase 5 — Exercises   | 9      | 9      | 0           | 0           |
 | Phase 6 — Analytics   | 11     | 10     | 0           | 1           |
-| Phase 7 — Hardening   | 13     | 9      | 0           | 4           |
-| Phase 8 — Packaging   | 10     | 5      | 0           | 5           |
-| Phase 9 — Website     | 12     | 11     | 0           | 1           |
-| **Total**             | **93** | **82** | **0**       | **11**      |
+| Phase 7 — Hardening   | 19     | 17     | 0           | 2           |
+| Phase 8 — Packaging   | 10     | 7      | 0           | 3           |
+| Phase 9 — Website     | 12     | 12     | 0           | 0           |
+| **Total**             | **100** | **94** | **0**       | **6**       |
 
 ---
 
@@ -222,19 +228,18 @@ TECH STACK (DO NOT CHANGE):
 CURRENT STATE:
 - Phase 0-1: Complete (monorepo, app shell, docs, CI, linting, testing, packaging skeleton)
 - Phase 2: Complete — dashboard, theme, navigation, settings, 6 reusable widgets, design system
-- Phase 3: Complete — timer engine, state machine, database layer, notifications, monitoring UI
+- Phase 3: Complete — timer engine, state machine, database layer, notifications, monitoring UI, onboarding wizard
 - Phase 4: Complete — camera adapter, time-based blink estimation, monitoring service, UI integration, tests
 - Phase 5: Complete — exercises catalog (6), cards, detail page, animations, player, eye care articles (9)
 - Phase 6: Complete — analytics service, charts engine, export/delete, period comparison, 30 analytics tests
-- Phase 7: Mostly complete — hardening, accessibility, system tray, config validation, singleton lock
-  - Remaining: performance optimization, database migrations, privacy/security review
-- Phase 8: Partially done — docs, troubleshooting, versioning, release process, PyInstaller build working
+- Phase 7: Nearly complete — hardening, accessibility, system tray, config validation, singleton lock, migrations, onboarding, permission dialog, state components, documentation
+  - Remaining: performance optimization, privacy/security review
+- Phase 8: Mostly done — docs, troubleshooting, versioning, release process, PyInstaller build working
   - Remaining: Windows installer, macOS .dmg, release workflow, smoke tests
-- Phase 9: Nearly complete — full landing page with 13 sections, design system, animations, SEO, tests
-  - Remaining: Roadmap section
+- Phase 9: Complete — full landing page with 14 sections, Roadmap, design system, animations, SEO, tests
 
 TEST COUNTS:
-- Desktop: 181 tests (pytest) — all passing
+- Desktop: 177 tests (pytest) — all passing
 - Web: 6 tests (Vitest) — all passing
 
 DESKTOP STYLING RULES (CRITICAL):
@@ -252,10 +257,9 @@ WEB STYLING RULES (CRITICAL):
 5. Inter font via next/font/google
 
 WHAT TO WORK ON NEXT (priority order):
-1. Phase 7 remaining: performance optimization, database migrations, privacy/security review
-2. Website: Roadmap section
-3. Packaging: macOS .dmg, Windows .exe installer, release workflow
-4. Onboarding flow (Phase 3 remaining)
+1. Phase 7 remaining: performance optimization, privacy/security review
+2. Phase 8 remaining: macOS .dmg, Windows .exe installer, release workflow, smoke tests
+3. Phase 6 remaining: Score calculation (deferred — not in PRD v1 scope)
 
 PRIVACY RULES (NON-NEGOTIABLE):
 - Never persist webcam frames

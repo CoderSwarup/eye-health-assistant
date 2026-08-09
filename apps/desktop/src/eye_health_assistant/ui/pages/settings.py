@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QPushButton,
     QSpinBox,
+    QTimeEdit,
     QVBoxLayout,
     QWidget,
 )
@@ -125,6 +126,53 @@ class SettingsPage(QWidget):
         )
 
         layout.addWidget(notif_card)
+
+        # --- Quiet Hours ---
+        quiet_card, quiet_layout = _build_section("Quiet Hours")
+
+        self.quiet_hours_check = QCheckBox("Enable quiet hours")
+        self.quiet_hours_check.setObjectName("subtitle")
+        quiet_layout.addWidget(self.quiet_hours_check)
+
+        from PySide6.QtCore import QTime
+
+        self.quiet_start_edit = QTimeEdit()
+        self.quiet_start_edit.setDisplayFormat("HH:mm")
+        self.quiet_start_edit.setTime(QTime(22, 0))
+        quiet_layout.addLayout(_build_row("Start Time", self.quiet_start_edit))
+
+        self.quiet_end_edit = QTimeEdit()
+        self.quiet_end_edit.setDisplayFormat("HH:mm")
+        self.quiet_end_edit.setTime(QTime(7, 0))
+        quiet_layout.addLayout(_build_row("End Time", self.quiet_end_edit))
+
+        layout.addWidget(quiet_card)
+
+        # --- Sound ---
+        sound_card, sound_layout = _build_section("Sound")
+
+        self.sound_check = QCheckBox("Enable notification sounds")
+        self.sound_check.setObjectName("subtitle")
+        sound_layout.addWidget(self.sound_check)
+
+        layout.addWidget(sound_card)
+
+        # --- Startup Behavior ---
+        startup_card, startup_layout = _build_section("Startup Behavior")
+
+        self.start_minimized_check = QCheckBox("Start minimized to tray")
+        self.start_minimized_check.setObjectName("subtitle")
+        startup_layout.addWidget(self.start_minimized_check)
+
+        self.start_on_login_check = QCheckBox("Start on login")
+        self.start_on_login_check.setObjectName("subtitle")
+        startup_layout.addWidget(self.start_on_login_check)
+
+        self.start_monitoring_check = QCheckBox("Start monitoring automatically")
+        self.start_monitoring_check.setObjectName("subtitle")
+        startup_layout.addWidget(self.start_monitoring_check)
+
+        layout.addWidget(startup_card)
 
         # --- Smart Mode (Camera) ---
         smart_card, smart_layout = _build_section("Smart Mode (Camera)")
@@ -283,6 +331,35 @@ class SettingsPage(QWidget):
         self.notifications_check.setChecked(config.notifications_enabled)
         self.notif_interval_spin.setValue(config.min_notification_interval)
 
+        # Quiet Hours
+        self.quiet_hours_check.setChecked(
+            config.quiet_hours_start != "" or config.quiet_hours_end != ""
+        )
+        from PySide6.QtCore import QTime
+
+        try:
+            start_parts = config.quiet_hours_start.split(":")
+            self.quiet_start_edit.setTime(
+                QTime(int(start_parts[0]), int(start_parts[1]))
+            )
+        except (ValueError, IndexError):
+            self.quiet_start_edit.setTime(QTime(22, 0))
+        try:
+            end_parts = config.quiet_hours_end.split(":")
+            self.quiet_end_edit.setTime(
+                QTime(int(end_parts[0]), int(end_parts[1]))
+            )
+        except (ValueError, IndexError):
+            self.quiet_end_edit.setTime(QTime(7, 0))
+
+        # Sound
+        self.sound_check.setChecked(config.notification_sound_enabled)
+
+        # Startup
+        self.start_minimized_check.setChecked(config.start_minimized)
+        self.start_on_login_check.setChecked(config.start_on_login)
+        self.start_monitoring_check.setChecked(config.start_monitoring_auto)
+
         # Smart Mode
         self.camera_enabled_check.setChecked(config.camera_enabled)
         self.camera_preview_check.setChecked(config.camera_preview_enabled)
@@ -312,6 +389,22 @@ class SettingsPage(QWidget):
 
         config.notifications_enabled = self.notifications_check.isChecked()
         config.min_notification_interval = self.notif_interval_spin.value()
+
+        # Quiet Hours
+        if self.quiet_hours_check.isChecked():
+            config.quiet_hours_start = self.quiet_start_edit.time().toString("HH:mm")
+            config.quiet_hours_end = self.quiet_end_edit.time().toString("HH:mm")
+        else:
+            config.quiet_hours_start = ""
+            config.quiet_hours_end = ""
+
+        # Sound
+        config.notification_sound_enabled = self.sound_check.isChecked()
+
+        # Startup
+        config.start_minimized = self.start_minimized_check.isChecked()
+        config.start_on_login = self.start_on_login_check.isChecked()
+        config.start_monitoring_auto = self.start_monitoring_check.isChecked()
 
         # Smart Mode
         config.camera_enabled = self.camera_enabled_check.isChecked()

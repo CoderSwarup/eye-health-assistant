@@ -26,9 +26,23 @@ class Database:
         self._session_factory = sessionmaker(bind=self._engine)
 
     def initialize(self) -> None:
-        """Create all tables if they do not exist."""
+        """Create tables and run pending migrations."""
         self._db_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Create tables that don't exist yet
         Base.metadata.create_all(self._engine)
+
+        # Run migrations for schema evolution
+        session = self._session_factory()
+        try:
+            from eye_health_assistant.infrastructure.database.migrations import (
+                apply_migrations,
+            )
+
+            apply_migrations(session)
+        finally:
+            session.close()
+
         logger.info("Database initialized at %s", self._db_path)
 
     def get_session(self) -> Session:

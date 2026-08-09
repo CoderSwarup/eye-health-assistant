@@ -84,6 +84,21 @@ class Config:
     ear_open_threshold: float = 0.28
     ear_closed_threshold: float = 0.20
 
+    # Quiet hours
+    quiet_hours_start: str = "22:00"
+    quiet_hours_end: str = "07:00"
+
+    # Sound
+    notification_sound_enabled: bool = True
+
+    # Startup behavior
+    start_minimized: bool = False
+    start_on_login: bool = False
+    start_monitoring_auto: bool = False
+
+    # Onboarding
+    onboarding_completed: bool = False
+
     def __post_init__(self) -> None:
         if self.database_path is None:
             self.database_path = self.app_data_dir / "database" / "app.sqlite"

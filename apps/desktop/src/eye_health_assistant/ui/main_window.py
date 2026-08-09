@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import logging
 
-from PySide6.QtCore import Qt, Slot
-from PySide6.QtGui import QCloseEvent
+from PySide6.QtCore import Qt, QUrl, Slot
+from PySide6.QtGui import QCloseEvent, QDesktopServices, QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QMainWindow,
@@ -21,6 +21,7 @@ from eye_health_assistant.ui.pages.exercises import ExercisesPage
 from eye_health_assistant.ui.pages.eye_care import EyeCarePage
 from eye_health_assistant.ui.pages.history import HistoryPage
 from eye_health_assistant.ui.pages.monitoring import MonitoringPage
+from eye_health_assistant.ui.pages.onboarding import OnboardingPage
 from eye_health_assistant.ui.pages.settings import SettingsPage
 from eye_health_assistant.ui.pages.statistics import StatisticsPage
 from eye_health_assistant.ui.themes.manager import ThemeManager, ThemeMode
@@ -48,7 +49,14 @@ class MainWindow(QMainWindow):
         # Build UI
         self._build_ui()
         self._setup_tray()
-        self._navigate_to("dashboard")
+        self._setup_keyboard_shortcuts()
+
+        # Show onboarding on first launch, otherwise show dashboard
+        if self.deps.config.onboarding_completed:
+            self._navigate_to("dashboard")
+        else:
+            self.sidebar.setVisible(False)
+            self._show_onboarding()
 
     def _build_ui(self) -> None:
         """Build the main UI layout."""
@@ -133,6 +141,17 @@ class MainWindow(QMainWindow):
         theme_btn.clicked.connect(self._toggle_theme)
         sidebar_layout.addWidget(theme_btn)
 
+        # GitHub link
+        github_btn = QPushButton("GitHub")
+        github_btn.setObjectName("secondary-button")
+        github_btn.setAccessibleName("Open GitHub repository in browser")
+        github_btn.clicked.connect(
+            lambda: QDesktopServices.openUrl(
+                QUrl("https://github.com/CoderSwarup/eye-health-assistant")
+            )
+        )
+        sidebar_layout.addWidget(github_btn)
+
         return sidebar
 
     def _setup_tray(self) -> None:
@@ -159,6 +178,32 @@ class MainWindow(QMainWindow):
         self._tray.show()
         logger.info("System tray initialized")
 
+    def _setup_keyboard_shortcuts(self) -> None:
+        """Set up keyboard shortcuts for navigation and actions."""
+        # Page navigation shortcuts (1-7)
+        page_keys = [
+            ("1", "dashboard"),
+            ("2", "monitoring"),
+            ("3", "exercises"),
+            ("4", "eye_care"),
+            ("5", "statistics"),
+            ("6", "history"),
+            ("7", "settings"),
+        ]
+        for key, page_id in page_keys:
+            shortcut = QShortcut(QKeySequence(key), self)
+            shortcut.activated.connect(
+                lambda pid=page_id: self._navigate_to(pid)
+            )
+
+        # Escape to go back to dashboard
+        esc = QShortcut(QKeySequence(Qt.Key.Key_Escape), self)
+        esc.activated.connect(lambda: self._navigate_to("dashboard"))
+
+        # Set focus policies on sidebar buttons
+        for btn in self.nav_buttons.values():
+            btn.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+
     def _create_pages(self) -> None:
         """Create all page instances."""
         self.pages["dashboard"] = DashboardPage(deps=self.deps)
@@ -177,6 +222,15 @@ class MainWindow(QMainWindow):
         self.pages["statistics"] = StatisticsPage(deps=self.deps)
         self.pages["history"] = HistoryPage(deps=self.deps)
         self.pages["settings"] = SettingsPage(deps=self.deps)
+
+        # Onboarding page (shown on first launch)
+        self._onboarding = OnboardingPage(deps=self.deps)
+        self._onboarding.completed.connect(self._on_onboarding_completed)
+
+    def _on_onboarding_completed(self) -> None:
+        """Handle onboarding completion — show dashboard and sidebar."""
+        self.sidebar.setVisible(True)
+        self._navigate_to("dashboard")
 
     def _navigate_to(self, page_id: str) -> None:
         """Navigate to a page by ID."""
@@ -204,6 +258,17 @@ class MainWindow(QMainWindow):
                     widget.setParent(None)
 
         self.page_layout.addWidget(page)
+
+    def _show_onboarding(self) -> None:
+        """Show the onboarding page (replaces content area, hides sidebar)."""
+        while self.page_layout.count():
+            item = self.page_layout.takeAt(0)
+            if item is not None:
+                widget = item.widget()
+                if widget is not None:
+                    widget.setParent(None)
+
+        self.page_layout.addWidget(self._onboarding)
 
     def _show_from_tray(self) -> None:
         """Show the window from tray."""
