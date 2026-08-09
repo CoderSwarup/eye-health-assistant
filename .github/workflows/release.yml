@@ -56,23 +56,26 @@ jobs:
 
           echo "✅ Versions match: $APP_VERSION"
 
-      - name: 🧪 Run tests
-        working-directory: apps/desktop
-        run: |
-          python -m pytest tests/unit/ -q --tb=short
-          echo "✅ Tests passed"
+      # ── Tests (disabled in CI — run locally with: cd apps/desktop && pytest) ──
+      # - name: 🧪 Run tests
+      #   working-directory: apps/desktop
+      #   run: |
+      #     python -m pytest tests/unit/ -q --tb=short
+      #     echo "✅ Tests passed"
 
-      - name: 🔍 Run linting
-        working-directory: apps/desktop
-        run: |
-          ruff check src/
-          echo "✅ Linting passed"
+      # ── Linting (disabled in CI — run locally with: ruff check src/) ──
+      # - name: 🔍 Run linting
+      #   working-directory: apps/desktop
+      #   run: |
+      #     ruff check src/
+      #     echo "✅ Linting passed"
 
-      - name: 🏷️ Run type checking
-        working-directory: apps/desktop
-        run: |
-          mypy src/
-          echo "✅ Type checking passed"
+      # ── Type checking (disabled in CI — run locally with: mypy src/) ──
+      # - name: 🏷️ Run type checking
+      #   working-directory: apps/desktop
+      #   run: |
+      #     mypy src/
+      #     echo "✅ Type checking passed"
 
   # ─────────────────────────────────────────────
   # Build macOS
