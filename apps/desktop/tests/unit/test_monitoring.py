@@ -174,20 +174,25 @@ class TestMonitoringService:
         )
         assert not service.is_active
 
-    @patch("eye_health_assistant.infrastructure.camera.adapter.OpenCVCamera")
-    def test_start_stop(self, _mock_cam: MagicMock) -> None:
+    @patch("eye_health_assistant.monitoring.service.OpenCVCamera")
+    def test_start_stop(self, mock_cam: MagicMock) -> None:
         """Test starting and stopping the monitoring service."""
         # Mock the camera
-        _mock_cam.return_value.open.return_value = None
+        mock_cam.return_value.open.return_value = None
         frame = np.zeros((480, 640, 3), dtype=np.uint8)
-        _mock_cam.return_value.read.return_value = frame
+        mock_cam.return_value.read.return_value = frame
+        mock_cam.return_value.is_opened.return_value = True
 
         service = MonitoringService(
             config=self.config,
             notification_service=self.notifications,
         )
         service.start()
-        time.sleep(0.1)
+        # Wait for worker to start
+        for _ in range(10):
+            time.sleep(0.05)
+            if service.is_active:
+                break
         assert service.is_active
         service.stop()
         assert not service.is_active

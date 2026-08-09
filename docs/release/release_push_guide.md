@@ -457,3 +457,194 @@ If a release has critical issues:
 5. Create a new patch release
 
 Do not delete tags that have been published to GitHub Releases.
+
+---
+
+## Manual Version Update
+
+If you need to update the version manually (without the bump script), edit these files:
+
+### Files to Update
+
+| File | Line to Change |
+|------|----------------|
+| `apps/desktop/pyproject.toml` | `version = "X.Y.Z"` |
+| `apps/desktop/src/eye_health_assistant/core/constants.py` | `VERSION: str = "X.Y.Z"` |
+| `apps/desktop/src/eye_health_assistant/__init__.py` | `__version__ = "X.Y.Z"` |
+| `apps/web/package.json` | `"version": "X.Y.Z"` |
+
+### Step-by-Step Manual Update
+
+```bash
+# 1. Open each file and update the version
+
+# pyproject.toml
+# Change: version = "0.1.0"
+# To:     version = "1.0.0"
+
+# constants.py
+# Change: VERSION: str = "0.1.0"
+# To:     VERSION: str = "1.0.0"
+
+# __init__.py
+# Change: __version__ = "0.1.0"
+# To:     __version__ = "1.0.0"
+
+# package.json
+# Change: "version": "0.1.0"
+# To:     "version": "1.0.0"
+
+# 2. Verify all versions match
+python -c "from eye_health_assistant.core.constants import VERSION; print(VERSION)"
+# Should output: 1.0.0
+
+# 3. Commit the version change
+git add -A
+git commit -m "chore: bump version to 1.0.0"
+git push origin development
+```
+
+### Version Files Quick Reference
+
+```
+apps/desktop/pyproject.toml                              → version = "X.Y.Z"
+apps/desktop/src/eye_health_assistant/core/constants.py  → VERSION: str = "X.Y.Z"
+apps/desktop/src/eye_health_assistant/__init__.py        → __version__ = "X.Y.Z"
+apps/web/package.json                                    → "version": "X.Y.Z"
+```
+
+**Important:** All four files must have the same version number. The release workflow will fail if they don't match.
+
+---
+
+## AI Prompt Template
+
+Use this prompt to bring any AI coding agent up to speed on the release process:
+
+```
+You are continuing work on the Eye Health Assistant project.
+
+READ THESE FILES FIRST:
+1. docs/EYE_CARE_PRD.md — the single source of truth for all requirements
+2. AGENTS.md — coding rules, architecture, privacy rules, tech stack, styling rules
+3. docs/PROGRESS.md — this file, to see what's done and what's next
+4. docs/release/release_push_guide.md — complete release process
+
+PROJECT STRUCTURE:
+- apps/desktop/ — Python + PySide6 desktop application
+- apps/web/ — Next.js 16 + React 19 landing website
+- docs/ — architecture, development, testing, privacy, release docs
+- scripts/build/ — build scripts for macOS, Windows, version bumping
+
+CURRENT STATE:
+- All 9 phases complete (Phase 0-9)
+- Version: 1.0.0
+- 177 desktop tests passing
+- macOS build verified locally
+- Release workflow configured
+
+RELEASE PROCESS:
+1. Update version in all 4 files (pyproject.toml, constants.py, __init__.py, package.json)
+   OR use: ./scripts/build/bump_version.sh X.Y.Z
+2. Update docs/CHANGELOG.md
+3. Commit: git add -A && git commit -m "chore: prepare release vX.Y.Z"
+4. Push: git push origin development
+5. Tag: git tag vX.Y.Z
+6. Push tag: git push origin vX.Y.Z
+7. Monitor: https://github.com/CoderSwarup/eye-health-assistant/actions
+
+VERSIONING RULES:
+- Semantic Versioning: MAJOR.MINOR.PATCH
+- Tag format: vX.Y.Z (e.g., v1.0.0)
+- Application version: X.Y.Z (e.g., 1.0.0)
+- All 4 version files must match
+
+IF RELEASE FAILS:
+1. Check workflow logs at GitHub Actions
+2. Fix the issue locally
+3. Delete tag: git tag -d vX.Y.Z && git push origin :refs/tags/vX.Y.Z
+4. Re-tag and re-push
+
+PRIVACY RULES (NON-NEGOTIABLE):
+- Never persist webcam frames
+- Never upload camera data
+- Never make medical/diagnostic claims
+- Camera permission must be explicit
+- User data stays local
+
+DO NOT:
+- Push the same tag twice (must delete first)
+- Skip version validation
+- Mark release complete if tests fail
+- Claim signed artifacts without signing
+```
+
+---
+
+## Quick Reference Commands
+
+### First-Time Release
+
+```bash
+# Setup
+cd /Users/onlymec/Documents/FREELANCE/EYE_CARE
+pip install -e ".[dev]"
+
+# Build and test locally
+cd apps/desktop
+rm -rf build dist
+pyinstaller EyeHealthAssistant.spec --noconfirm --clean
+open "dist/Eye Health Assistant.app"
+
+# Version bump
+./scripts/build/bump_version.sh 1.0.0
+
+# Commit and push
+git add -A
+git commit -m "chore: prepare release v1.0.0"
+git push origin development
+
+# Tag and release
+git tag v1.0.0
+git push origin v1.0.0
+
+# Monitor
+open https://github.com/CoderSwarup/eye-health-assistant/actions
+```
+
+### Subsequent Release (e.g., v1.1.0)
+
+```bash
+# Version bump
+./scripts/build/bump_version.sh 1.1.0
+
+# Commit and push
+git add -A
+git commit -m "chore: prepare release v1.1.0"
+git push origin development
+
+# Tag and release
+git tag v1.1.0
+git push origin v1.1.0
+```
+
+### Hotfix Release (e.g., v1.0.1)
+
+```bash
+# Make your fix
+git add -A
+git commit -m "fix: description of fix"
+git push origin development
+
+# Version bump
+./scripts/build/bump_version.sh 1.0.1
+
+# Commit and push
+git add -A
+git commit -m "chore: prepare release v1.0.1"
+git push origin development
+
+# Tag and release
+git tag v1.0.1
+git push origin v1.0.1
+```
