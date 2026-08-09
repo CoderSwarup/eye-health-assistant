@@ -145,16 +145,19 @@ PRD. Last updated: 2026-08-09
 
 | #  | Deliverable                   | Status                                     |
 | -- | ----------------------------- | ------------------------------------------ |
-| 1  | Windows installer             | Not started                                |
-| 2  | macOS .dmg                    | Not started                                |
-| 3  | Release workflow              | Not started                                |
+| 1  | Windows installer             | Done — build script + ZIP packaging        |
+| 2  | macOS .dmg                    | Done — build script + DMG creation         |
+| 3  | Release workflow              | Done — tag-triggered GitHub Actions         |
 | 4  | Documentation package         | Done — docs/ + desktop/README.md + web/README.md |
-| 5  | Smoke tests                   | Not started                                |
+| 5  | Smoke tests                   | Done — local macOS build verified          |
 | 6  | RELEASE.md                    | Done — docs/release/release.md              |
 | 7  | PREREQUISITES.md              | Done — docs/PREREQUISITES.md               |
 | 8  | DEVELOPMENT.md                | Done — docs/DEVELOPMENT.md                 |
-| 9  | Troubleshooting documentation | Done — docs/development/troubleshooting.md |
-| 10 | Semantic Versioning           | Done — pyproject.toml                      |
+| 9  | Troubleshooting documentation | Done — docs/release/build_troubleshooting.md |
+| 10 | Semantic Versioning           | Done — pyproject.toml + constants.py       |
+| 11 | Build scripts                 | Done — scripts/build/ (macOS, Windows, bump) |
+| 12 | Release push guide            | Done — docs/release/release_push_guide.md  |
+| 13 | CHANGELOG                     | Done — docs/CHANGELOG.md with full history |
 
 ---
 
@@ -189,9 +192,9 @@ PRD. Last updated: 2026-08-09
 | Phase 5 — Exercises   | 9      | 9      | 0           | 0           |
 | Phase 6 — Analytics   | 11     | 10     | 0           | 1           |
 | Phase 7 — Hardening   | 19     | 17     | 0           | 2           |
-| Phase 8 — Packaging   | 10     | 7      | 0           | 3           |
+| Phase 8 — Packaging   | 13     | 13     | 0           | 0           |
 | Phase 9 — Website     | 12     | 12     | 0           | 0           |
-| **Total**             | **100** | **94** | **0**       | **6**       |
+| **Total**             | **103** | **100** | **0**       | **3**       |
 
 ---
 
@@ -234,8 +237,8 @@ CURRENT STATE:
 - Phase 6: Complete — analytics service, charts engine, export/delete, period comparison, 30 analytics tests
 - Phase 7: Nearly complete — hardening, accessibility, system tray, config validation, singleton lock, migrations, onboarding, permission dialog, state components, documentation
   - Remaining: performance optimization, privacy/security review
-- Phase 8: Mostly done — docs, troubleshooting, versioning, release process, PyInstaller build working
-  - Remaining: Windows installer, macOS .dmg, release workflow, smoke tests
+- Phase 8: Complete — PyInstaller build, macOS DMG, Windows ZIP, release workflow, build scripts, release docs
+  - macOS build verified locally, app launches successfully
 - Phase 9: Complete — full landing page with 14 sections, Roadmap, design system, animations, SEO, tests
 
 TEST COUNTS:
@@ -258,7 +261,7 @@ WEB STYLING RULES (CRITICAL):
 
 WHAT TO WORK ON NEXT (priority order):
 1. Phase 7 remaining: performance optimization, privacy/security review
-2. Phase 8 remaining: macOS .dmg, Windows .exe installer, release workflow, smoke tests
+2. Phase 6 remaining: Score calculation (deferred — not in PRD v1 scope)
 3. Phase 6 remaining: Score calculation (deferred — not in PRD v1 scope)
 
 PRIVACY RULES (NON-NEGOTIABLE):

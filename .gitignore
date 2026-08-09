@@ -6,7 +6,6 @@ __pycache__/
 *.egg-info/
 *.egg
 dist/
-build/
 eggs/
 *.whl
 pip-log.txt
@@ -66,7 +65,12 @@ out/
 .env.production.local
 npm-debug.log*
 
-# Build artifacts
+# Build artifacts (except scripts/build/ and specific spec files)
+build/
+!scripts/build/
+scripts/build/*
+!scripts/build/*.sh
+!scripts/build/*.bat
 *.exe
 *.dmg
 *.AppImage
@@ -75,6 +79,7 @@ npm-debug.log*
 *.msi
 *.app
 *.spec
+!apps/desktop/*.spec
 
 # Logs
 *.log
