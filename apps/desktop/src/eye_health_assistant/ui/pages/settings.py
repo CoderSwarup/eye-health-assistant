@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import logging
+
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -16,6 +19,8 @@ from PySide6.QtWidgets import (
 )
 
 from eye_health_assistant.app.dependencies import Dependencies
+
+logger = logging.getLogger(__name__)
 
 
 def _build_section(title: str) -> tuple[QFrame, QVBoxLayout]:
@@ -68,6 +73,13 @@ class SettingsPage(QWidget):
         title = QLabel("Settings")
         title.setObjectName("page-title")
         layout.addWidget(title)
+
+        # Status label for save feedback
+        self._status_label = QLabel("")
+        self._status_label.setObjectName("subtitle")
+        self._status_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self._status_label.setVisible(False)
+        layout.addWidget(self._status_label)
 
         # --- Appearance ---
         appearance_card, appearance_layout = _build_section("Appearance")
@@ -207,15 +219,37 @@ class SettingsPage(QWidget):
 
         self._export_btn = QPushButton("Export Data")
         self._export_btn.setObjectName("secondary-button")
+        self._export_btn.setAccessibleName("Export all data as JSON file")
         self._export_btn.clicked.connect(self._on_export)
         data_layout.addWidget(self._export_btn)
 
         self._delete_btn = QPushButton("Delete All Data")
         self._delete_btn.setObjectName("danger-button")
+        self._delete_btn.setAccessibleName("Permanently delete all application data")
         self._delete_btn.clicked.connect(self._on_delete_all)
         data_layout.addWidget(self._delete_btn)
 
         layout.addWidget(data_card)
+
+        # --- Action buttons ---
+        btn_layout = QHBoxLayout()
+        btn_layout.setSpacing(10)
+
+        self._reset_btn = QPushButton("Reset to Defaults")
+        self._reset_btn.setObjectName("secondary-button")
+        self._reset_btn.setAccessibleName("Reset all settings to default values")
+        self._reset_btn.clicked.connect(self._on_reset)
+        btn_layout.addWidget(self._reset_btn)
+
+        btn_layout.addStretch()
+
+        self._save_btn = QPushButton("Save Settings")
+        self._save_btn.setObjectName("primary-button")
+        self._save_btn.setAccessibleName("Save current settings to disk")
+        self._save_btn.clicked.connect(self._on_save)
+        btn_layout.addWidget(self._save_btn)
+
+        layout.addLayout(btn_layout)
 
         layout.addStretch()
 
@@ -265,8 +299,8 @@ class SettingsPage(QWidget):
         self.rolling_window_spin.setValue(config.rolling_window_minutes)
         self.sustained_low_spin.setValue(config.sustained_low_blink_seconds)
 
-    def save(self) -> None:
-        """Save current widget values back to config."""
+    def _apply_values_to_config(self) -> None:
+        """Apply widget values to the config object (without saving)."""
         config = self.deps.config
 
         theme_values = {0: "light", 1: "dark", 2: "system"}
@@ -297,6 +331,48 @@ class SettingsPage(QWidget):
         config.blink_rate_threshold = self.blink_threshold_spin.value()
         config.rolling_window_minutes = self.rolling_window_spin.value()
         config.sustained_low_blink_seconds = self.sustained_low_spin.value()
+
+    def _show_status(self, message: str, is_error: bool = False) -> None:
+        """Show a status message to the user."""
+        self._status_label.setText(message)
+        self._status_label.setVisible(True)
+        if is_error:
+            self._status_label.setStyleSheet("color: #ef4444;")
+        else:
+            self._status_label.setStyleSheet("color: #22c55e;")
+
+    def _on_save(self) -> None:
+        """Save settings with validation."""
+        self._apply_values_to_config()
+        errors = self.deps.save_config()
+
+        if errors:
+            self._show_status(
+                "Validation errors:\n" + "\n".join(f"  - {e}" for e in errors),
+                is_error=True,
+            )
+            logger.warning("Settings save failed: %s", errors)
+        else:
+            self._show_status("Settings saved successfully.")
+            logger.info("Settings saved")
+
+    def _on_reset(self) -> None:
+        """Reset all settings to defaults."""
+        from PySide6.QtWidgets import QMessageBox
+
+        reply = QMessageBox.question(
+            self,
+            "Reset Settings",
+            "Reset all settings to their default values?\n\n"
+            "This will not save until you click Save.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+
+        if reply == QMessageBox.StandardButton.Yes:
+            self.deps.config = type(self.deps.config)()  # Create default config
+            self._load_values()
+            self._show_status("Settings reset to defaults. Click Save to apply.")
 
     def _on_export(self) -> None:
         """Export all data as JSON."""

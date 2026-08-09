@@ -40,19 +40,9 @@ PRD. Last updated: 2026-08-09
 | 1 | Navigation system (sidebar)                         | Done                       |
 | 2 | Theme system (light, dark, system)                  | Done — all mypy errors fixed |
 | 3 | Dashboard (metrics, monitoring card, quick actions) | Done — dark theme polished |
-| 4 | Settings page                                       | Done — full page with 5 sections     |
+| 4 | Settings page                                       | Done — full page with save/reset/export/delete |
 | 5 | Reusable component library                          | Done — 6 widgets           |
 | 6 | Design system (typography, spacing)                 | Done — tokens + spacing    |
-
-**Desktop fixes completed this session:**
-- Dark theme: removed card borders (transparent), metric cards use `background_tertiary`
-- QFrame: all instances call `setFrameShape(QFrame.Shape.NoFrame)` to prevent native border rendering
-- Labels inside cards: explicit `border: none; background-color: transparent`
-- Font: changed from `-apple-system` (CSS-only) to `Helvetica, Arial, sans-serif` (Qt-compatible)
-- Ctrl+C handling: signal handler + 200ms timer poll for clean exit
-- All mypy errors fixed: `QScrollArea.Shape.NoFrame`, `Qt.AlignmentFlag.AlignLeft/AlignCenter`, None-safe layout handling
-- Dashboard spacing: outer margins 36,28; section spacing 28; card spacing 16
-- AGENTS.md updated with 7 desktop styling rules
 
 ---
 
@@ -68,20 +58,6 @@ PRD. Last updated: 2026-08-09
 | 6 | History               | Done — database-backed session log |
 | 7 | SQLite database layer | Done — SQLAlchemy ORM with migrations |
 | 8 | Onboarding flow       | Not started |
-
-**Timer mode completed this session:**
-- Domain models: `TimerPhase`, `SessionStatus`, `SessionMode` enums, `TimerSession` dataclass
-- Database layer: `TimerSessionRow` ORM, `Database` engine, `SessionRepository` with CRUD
-- Timer engine: `TimerEngine` state machine with `FakeClock` for testing
-- Timer controller: `TimerController` Qt-integrated with signals for UI updates
-- Notification service: `NotificationService` with desktop notifications
-- DI wiring: `Dependencies` container initializes database, repository, services
-- Monitoring page: `MonitoringPage` UI with timer display, controls, progress
-- Dashboard wiring: Quick action buttons navigate to monitoring page
-- History page: Database-backed session list with empty state
-- Statistics page: Dynamic metrics from database with summary cards
-- Tests: 18 new tests (11 engine, 7 repository), all passing
-- Quality: ruff clean, mypy clean, 80/80 tests passing
 
 ---
 
@@ -101,19 +77,6 @@ PRD. Last updated: 2026-08-09
 | 10 | Low-blink notification logic | Done — sustained low-blink reminders |
 | 11 | Thread/worker architecture   | Done — QThread worker with signals |
 
-**Camera mode completed this session:**
-- Infrastructure: `OpenCVCamera` adapter, `OpenCVFaceDetector` with YuNet DNN fallback
-- Blink engine: EAR calculator, `BlinkDetector` state machine, `MetricsAggregator` rolling window
-- Monitoring: `MonitoringWorker` QThread with time-based blink estimation (research-based 6 blinks/min during screen use)
-- Database: `MonitoringSessionRow`, `BlinkMeasurementRow` ORM models
-- Repository: `MonitoringRepository` with session/CRUD and measurements
-- Dashboard: Real-time face detection, blink rate, camera status indicators
-- Settings: Camera device selection, preview toggle, sampling FPS, EAR thresholds
-- Statistics: Blink rate statistics from monitoring sessions
-- History: Monitoring sessions displayed alongside timer sessions
-- Tests: 28 blink engine tests, 10 monitoring tests, 9 repository tests — all passing
-- Quality: ruff clean, mypy clean, 127/127 tests passing
-
 **Note:** Automatic blink detection from camera requires precise eye landmarks (MediaPipe Face Mesh), which is unavailable on Python 3.14. The worker uses time-based estimation calibrated to research data (5-7 blinks/min during screen use). Camera preview and face detection work correctly.
 
 ---
@@ -127,17 +90,10 @@ PRD. Last updated: 2026-08-09
 | 3 | Exercise detail screen     | Done — ExerciseDetailPage    |
 | 4 | Exercise animations        | Done — engine + controller + player |
 | 5 | Exercise content (JSON)    | Done — content/exercises/   |
-| 6 | Eye Care / Learning Center | Done — 8 articles           |
+| 6 | Eye Care / Learning Center | Done — 9 articles           |
 | 7 | Eye Care detail screen     | Done — ArticleDetailPage     |
 | 8 | Eye Care content (JSON)    | Done — content/eye_care/    |
 | 9 | Content loader             | Done — content/loader.py + validation |
-
-**Exercise animations completed this session:**
-- Animation engine: `BlinkAnimation`, `LookAwayAnimation`, `NearFarAnimation` with QTimer-based 60fps rendering
-- Exercise controller: State machine (READY → COUNTDOWN → RUNNING → PAUSED → COMPLETED/CANCELLED)
-- Exercise player page: Full UI with countdown overlay, instruction display, progress bar, pause/resume/end controls
-- Tests: 24 new tests for controller and animation factory, all passing
-- Quality: ruff clean, mypy clean, 151/151 tests passing
 
 ---
 
@@ -157,35 +113,25 @@ PRD. Last updated: 2026-08-09
 | 10 | Data deletion      | Done — delete all with confirmation |
 | 11 | Product metrics    | Done — active days, sessions, blink rate |
 
-**Analytics completed this session:**
-- Analytics service: `AnalyticsService` with daily/weekly/monthly aggregation, comparison logic, export, deletion
-- Charts engine: `BarChartWidget`, `LineChartWidget`, `SummaryCard` using QPainter (no external deps)
-- Statistics page: Period selector, 6 summary cards, activity bar chart, blink rate line chart, comparison section
-- History page: Filtering by All/Timer/Smart Mode, session cards
-- Dashboard: Historical data loading from analytics service
-- Settings: Wired Export Data and Delete All Data buttons with confirmation dialogs
-- Tests: 30 new analytics tests, all passing
-- Quality: ruff clean, mypy clean, 181/181 tests passing
-
 ---
 
 ## Phase 7 — Hardening
 
-| #  | Deliverable               | Status                                    |
-| -- | ------------------------- | ----------------------------------------- |
-| 1  | Error handling            | Partial — Result type, exceptions defined |
-| 2  | Accessibility             | Partial — web has prefers-reduced-motion  |
-| 3  | Performance optimization  | Not started                               |
-| 4  | Database migrations       | Not started                               |
-| 5  | Privacy review            | Not started                               |
-| 6  | Security review           | Not started                               |
-| 7  | UI states for all screens | Not started                               |
-| 8  | Logging system            | Done — core/logging.py                    |
-| 9  | Cross-platform isolation  | Partial — platform adapter stubs          |
-| 10 | Local file layout         | Not started                               |
-| 11 | System tray / menu bar    | Not started                               |
-| 12 | Startup behavior settings | Not started                               |
-| 13 | Configuration precedence  | Partial — core/config.py                  |
+| #  | Deliverable               | Status                                              |
+| -- | ------------------------- | --------------------------------------------------- |
+| 1  | Error handling            | Done — consolidated exception hierarchy, Result type |
+| 2  | Accessibility             | Done — accessible names on all interactive widgets   |
+| 3  | Performance optimization  | Not started                                         |
+| 4  | Database migrations       | Not started                                         |
+| 5  | Privacy review            | Not started                                         |
+| 6  | Security review           | Not started                                         |
+| 7  | UI states for all screens | Not started                                         |
+| 8  | Logging system            | Done — core/logging.py with RotatingFileHandler      |
+| 9  | Cross-platform isolation  | Partial — platform adapter stubs                    |
+| 10 | Local file layout         | Done — get_app_data_dir() with platform paths       |
+| 11 | System tray / menu bar    | Done — SystemTray with menu, close-to-tray          |
+| 12 | Startup behavior settings | Done — singleton instance lock, config validation   |
+| 13 | Configuration precedence  | Done — Config.from_file(), validate(), atomic save  |
 
 ---
 
@@ -223,24 +169,6 @@ PRD. Last updated: 2026-08-09
 | 11 | SEO                         | Done — metadata, OG, Twitter, robots, canonical   |
 | 12 | Web testing                 | Done — 6 tests (config, FAQ, navigation)          |
 
-**Website sections built this session:**
-- Navigation: sticky glass nav, mobile hamburger, scroll backdrop
-- Hero: gradient headline, product mockup dashboard, ambient glow, staggered entrance
-- SmartMonitoring: 5-step camera→processing→landmarks→estimation→privacy pipeline
-- TimerMode: interactive timer mockup with progress bar and stats
-- Privacy: 4 guarantees with icons
-- Exercises: 4 color-coded exercise cards
-- Statistics: bar chart mockup with weekly trends + insight callout
-- HowItWorks: 4-step numbered flow
-- EyeCare: 6 educational topic cards
-- CrossPlatform: macOS/Windows platform cards
-- FAQ: 10-question accordion (all PRD-required questions)
-- DownloadCTA: final download section
-- Design system: CSS variables, typography scale, scroll animations, glass effects, reduced-motion support
-- Inter font via next/font/google
-- Centralized site-config.ts for all links/URLs
-- Vitest config + 6 tests
-
 ---
 
 ## Summary
@@ -254,10 +182,10 @@ PRD. Last updated: 2026-08-09
 | Phase 4 — Camera Mode | 11     | 11     | 0           | 0           |
 | Phase 5 — Exercises   | 9      | 9      | 0           | 0           |
 | Phase 6 — Analytics   | 11     | 10     | 0           | 1           |
-| Phase 7 — Hardening   | 13     | 3      | 0           | 10          |
+| Phase 7 — Hardening   | 13     | 9      | 0           | 4           |
 | Phase 8 — Packaging   | 10     | 5      | 0           | 5           |
 | Phase 9 — Website     | 12     | 11     | 0           | 1           |
-| **Total**             | **93** | **76** | **0**       | **17**      |
+| **Total**             | **93** | **82** | **0**       | **11**      |
 
 ---
 
@@ -276,7 +204,6 @@ READ THESE FILES FIRST:
 PROJECT STRUCTURE:
 - apps/desktop/ — Python + PySide6 desktop application (see apps/desktop/README.md)
 - apps/web/ — Next.js 16 + React 19 landing website (see apps/web/README.md)
-- packages/design-tokens/ — shared design tokens
 - docs/ — architecture, development, testing, privacy, release docs
 
 ARCHITECTURE (desktop app):
@@ -297,31 +224,18 @@ CURRENT STATE:
 - Phase 2: Complete — dashboard, theme, navigation, settings, 6 reusable widgets, design system
 - Phase 3: Complete — timer engine, state machine, database layer, notifications, monitoring UI
 - Phase 4: Complete — camera adapter, time-based blink estimation, monitoring service, UI integration, tests
-  - 28 blink engine tests, 10 monitoring tests, 9 repository tests
-  - Dashboard shows real-time face detection, blink rate, camera status
-  - Settings page with camera device selection, preview toggle, EAR thresholds
-  - Statistics page shows blink rate statistics
-  - History page shows monitoring sessions alongside timer sessions
-  - Note: Automatic blink detection requires MediaPipe (unavailable on Python 3.14); uses research-based estimation
-- Phase 5: Complete — exercises catalog, cards, detail page, animations, player, eye care articles
-  - Animation engine with BlinkAnimation, LookAwayAnimation, NearFarAnimation
-  - ExerciseController state machine with countdown, pause, resume, cancel
-  - Exercise player page with full UI controls
-  - 24 new tests for controller and animation factory
-- Phase 6: Complete — analytics service, charts engine, export/delete, period comparison
-  - AnalyticsService with daily/weekly/monthly aggregation, comparison logic
-  - BarChartWidget + LineChartWidget using QPainter (no external dependencies)
-  - Statistics page with period selector, 6 summary cards, activity chart, blink rate chart
-  - History page with All/Timer/Smart Mode filtering
-  - JSON export with file dialog, delete all with confirmation
-  - Dashboard loads historical data from analytics service
-  - 30 new analytics tests, all passing
-- Phase 7: Partially done — Result type, exceptions, logging, UI states for all screens
-  - Remaining: accessibility, performance, database migrations, privacy/security review, system tray
+- Phase 5: Complete — exercises catalog (6), cards, detail page, animations, player, eye care articles (9)
+- Phase 6: Complete — analytics service, charts engine, export/delete, period comparison, 30 analytics tests
+- Phase 7: Mostly complete — hardening, accessibility, system tray, config validation, singleton lock
+  - Remaining: performance optimization, database migrations, privacy/security review
 - Phase 8: Partially done — docs, troubleshooting, versioning, release process, PyInstaller build working
   - Remaining: Windows installer, macOS .dmg, release workflow, smoke tests
 - Phase 9: Nearly complete — full landing page with 13 sections, design system, animations, SEO, tests
   - Remaining: Roadmap section
+
+TEST COUNTS:
+- Desktop: 181 tests (pytest) — all passing
+- Web: 6 tests (Vitest) — all passing
 
 DESKTOP STYLING RULES (CRITICAL):
 1. No borders on global QWidget rule — only background-color, color, font
@@ -338,11 +252,10 @@ WEB STYLING RULES (CRITICAL):
 5. Inter font via next/font/google
 
 WHAT TO WORK ON NEXT (priority order):
-1. Website: Roadmap section
-2. Database migrations
+1. Phase 7 remaining: performance optimization, database migrations, privacy/security review
+2. Website: Roadmap section
 3. Packaging: macOS .dmg, Windows .exe installer, release workflow
-4. Accessibility and performance optimization
-5. Onboarding flow (Phase 3 remaining)
+4. Onboarding flow (Phase 3 remaining)
 
 PRIVACY RULES (NON-NEGOTIABLE):
 - Never persist webcam frames

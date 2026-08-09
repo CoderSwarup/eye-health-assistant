@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 
 from PySide6.QtCore import Qt, Slot
+from PySide6.QtGui import QCloseEvent
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QMainWindow,
@@ -23,6 +24,7 @@ from eye_health_assistant.ui.pages.monitoring import MonitoringPage
 from eye_health_assistant.ui.pages.settings import SettingsPage
 from eye_health_assistant.ui.pages.statistics import StatisticsPage
 from eye_health_assistant.ui.themes.manager import ThemeManager, ThemeMode
+from eye_health_assistant.ui.tray import SystemTray
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +36,7 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
         self.deps = deps
         self.theme_manager = ThemeManager(self)
+        self._tray: SystemTray | None = None
 
         self.setWindowTitle("Eye Health Assistant")
         self.setMinimumSize(1100, 700)
@@ -44,6 +47,7 @@ class MainWindow(QMainWindow):
 
         # Build UI
         self._build_ui()
+        self._setup_tray()
         self._navigate_to("dashboard")
 
     def _build_ui(self) -> None:
@@ -115,6 +119,7 @@ class MainWindow(QMainWindow):
             btn = QPushButton(label)
             btn.setObjectName("nav-button")
             btn.setCheckable(True)
+            btn.setAccessibleName(f"Navigate to {label}")
             btn.clicked.connect(lambda _checked, pid=page_id: self._navigate_to(pid))
             self.nav_buttons[page_id] = btn
             sidebar_layout.addWidget(btn)
@@ -124,10 +129,35 @@ class MainWindow(QMainWindow):
         # Theme toggle
         theme_btn = QPushButton("Toggle Theme")
         theme_btn.setObjectName("secondary-button")
+        theme_btn.setAccessibleName("Toggle between light and dark theme")
         theme_btn.clicked.connect(self._toggle_theme)
         sidebar_layout.addWidget(theme_btn)
 
         return sidebar
+
+    def _setup_tray(self) -> None:
+        """Set up the system tray icon."""
+        if not SystemTray.isSystemTrayAvailable():
+            logger.info("System tray not available on this platform")
+            return
+
+        self._tray = SystemTray(deps=self.deps, parent=self)
+
+        # Connect tray signals
+        self._tray.show_window.connect(self._show_from_tray)
+        self._tray.start_timer.connect(self._start_timer_from_tray)
+        self._tray.start_smart_mode.connect(self._start_smart_from_tray)
+        self._tray.stop_smart_mode.connect(self._stop_smart_from_tray)
+        self._tray.open_exercises.connect(
+            lambda: self._navigate_to("exercises")
+        )
+        self._tray.open_settings.connect(
+            lambda: self._navigate_to("settings")
+        )
+        self._tray.quit_app.connect(self._quit_from_tray)
+
+        self._tray.show()
+        logger.info("System tray initialized")
 
     def _create_pages(self) -> None:
         """Create all page instances."""
@@ -175,6 +205,33 @@ class MainWindow(QMainWindow):
 
         self.page_layout.addWidget(page)
 
+    def _show_from_tray(self) -> None:
+        """Show the window from tray."""
+        self.showNormal()
+        self.activateWindow()
+        self.raise_()
+
+    def _start_timer_from_tray(self) -> None:
+        """Start timer from tray menu."""
+        self._navigate_to("monitoring")
+        self._show_from_tray()
+
+    def _start_smart_from_tray(self) -> None:
+        """Start smart mode from tray menu."""
+        if self.deps.monitoring_service:
+            self.deps.monitoring_service.start()
+
+    def _stop_smart_from_tray(self) -> None:
+        """Stop smart mode from tray menu."""
+        if self.deps.monitoring_service:
+            self.deps.monitoring_service.stop()
+
+    def _quit_from_tray(self) -> None:
+        """Quit the application from tray menu."""
+        self.deps.shutdown()
+        from PySide6.QtWidgets import QApplication
+        QApplication.quit()
+
     @Slot()
     def _toggle_theme(self) -> None:
         """Toggle between light and dark themes."""
@@ -183,3 +240,11 @@ class MainWindow(QMainWindow):
             self.theme_manager.set_theme(ThemeMode.LIGHT)
         else:
             self.theme_manager.set_theme(ThemeMode.DARK)
+
+    def closeEvent(self, event: QCloseEvent) -> None:  # noqa: N802
+        """Handle window close - minimize to tray instead of quitting."""
+        if self._tray and self._tray.isVisible():
+            self.hide()
+            event.ignore()
+        else:
+            event.accept()

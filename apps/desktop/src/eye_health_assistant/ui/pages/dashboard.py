@@ -84,6 +84,7 @@ class DashboardPage(QWidget):
 
         settings_btn = QPushButton("Settings")
         settings_btn.setObjectName("secondary-button")
+        settings_btn.setAccessibleName("Open settings page")
         settings_btn.clicked.connect(lambda: self.navigate_to.emit("settings"))
         header.addWidget(settings_btn)
 
@@ -116,26 +117,31 @@ class DashboardPage(QWidget):
         actions_layout.setSpacing(10)
 
         self._start_btn = QPushButton("Start Smart Mode")
+        self._start_btn.setAccessibleName("Toggle smart camera monitoring")
         self._start_btn.clicked.connect(self._toggle_monitoring)
         actions_layout.addWidget(self._start_btn)
 
         timer_btn = QPushButton("Start Timer")
         timer_btn.setObjectName("secondary-button")
+        timer_btn.setAccessibleName("Navigate to timer page")
         timer_btn.clicked.connect(lambda: self.navigate_to.emit("monitoring"))
         actions_layout.addWidget(timer_btn)
 
         exercises_btn = QPushButton("Exercises")
         exercises_btn.setObjectName("secondary-button")
+        exercises_btn.setAccessibleName("Navigate to exercises page")
         exercises_btn.clicked.connect(lambda: self.navigate_to.emit("exercises"))
         actions_layout.addWidget(exercises_btn)
 
         eye_care_btn = QPushButton("Eye Care")
         eye_care_btn.setObjectName("secondary-button")
+        eye_care_btn.setAccessibleName("Navigate to eye care articles")
         eye_care_btn.clicked.connect(lambda: self.navigate_to.emit("eye_care"))
         actions_layout.addWidget(eye_care_btn)
 
         stats_btn = QPushButton("Statistics")
         stats_btn.setObjectName("secondary-button")
+        stats_btn.setAccessibleName("Navigate to statistics page")
         stats_btn.clicked.connect(lambda: self.navigate_to.emit("statistics"))
         actions_layout.addWidget(stats_btn)
 
@@ -231,11 +237,13 @@ class DashboardPage(QWidget):
         controls_layout.setSpacing(10)
 
         self._session_btn = QPushButton("Start Session")
+        self._session_btn.setAccessibleName("Start or stop monitoring session")
         self._session_btn.clicked.connect(self._toggle_monitoring)
         controls_layout.addWidget(self._session_btn)
 
         skip_btn = QPushButton("Skip")
         skip_btn.setObjectName("secondary-button")
+        skip_btn.setAccessibleName("Skip current monitoring cycle")
         controls_layout.addWidget(skip_btn)
 
         controls_layout.addStretch()

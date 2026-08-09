@@ -7,23 +7,12 @@ from typing import Any, Protocol, cast
 
 import numpy as np
 
+from eye_health_assistant.core.exceptions import (
+    CameraNotAvailableError,
+    CameraReadError,
+)
+
 logger = logging.getLogger(__name__)
-
-
-class CameraError(Exception):
-    """Camera operation failed."""
-
-
-class CameraPermissionDeniedError(CameraError):
-    """Camera permission was denied by the user or OS."""
-
-
-class CameraNotAvailableError(CameraError):
-    """No camera is available on this system."""
-
-
-class CameraReadError(CameraError):
-    """Failed to read a frame from the camera."""
 
 
 class CameraAdapter(Protocol):

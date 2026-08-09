@@ -10,6 +10,7 @@ from eye_health_assistant.content.validation import (
     validate_articles,
     validate_exercises,
 )
+from eye_health_assistant.core.exceptions import ContentError
 from eye_health_assistant.core.result import Err, Ok, Result
 from eye_health_assistant.domain.models.article import (
     Article,
@@ -25,10 +26,6 @@ from eye_health_assistant.domain.models.exercise import (
 logger = logging.getLogger(__name__)
 
 _CONTENT_DIR = Path(__file__).parent
-
-
-class ContentError(Exception):
-    """Error loading or validating content."""
 
 
 def _parse_article(data: dict) -> Article:

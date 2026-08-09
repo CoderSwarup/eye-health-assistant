@@ -19,6 +19,10 @@ class CameraNotAvailableError(CameraError):
     """No camera is available on the system."""
 
 
+class CameraReadError(CameraError):
+    """Failed to read a frame from the camera."""
+
+
 class DatabaseError(EyeHealthError):
     """Database-related errors."""
 
