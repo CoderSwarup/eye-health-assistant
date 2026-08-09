@@ -56,7 +56,7 @@ for FILE in "${FILES[@]}"; do
 done
 
 echo ""
-echo "=== Version bumped to $NEXT_VERSION ==="
+echo "=== Version bumped to $NEW_VERSION ==="
 echo ""
 echo "Next steps:"
 echo "  1. Review changes: git diff"

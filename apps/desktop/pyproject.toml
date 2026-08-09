@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "eye-health-assistant"
-version = "0.1.0"
+version = "1.0.0"
 description = "A privacy-first desktop application for healthier screen-use habits"
 readme = "README.md"
 license = {text = "MIT"}

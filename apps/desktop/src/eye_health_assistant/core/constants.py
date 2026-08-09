@@ -1,7 +1,7 @@
 """Application constants."""
 
 APP_NAME: str = "Eye Health Assistant"
-VERSION: str = "0.1.0"
+VERSION: str = "1.0.0"
 APP_AUTHOR: str = "Eye Health Assistant Contributors"
 
 # Database
