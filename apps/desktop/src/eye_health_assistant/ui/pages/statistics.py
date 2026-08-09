@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QFrame,
@@ -36,19 +38,25 @@ class StatCard(QFrame):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(4)
 
-        title_label = QLabel(title)
-        title_label.setObjectName("caption")
-        layout.addWidget(title_label)
+        self._title_label = QLabel(title)
+        self._title_label.setObjectName("caption")
+        layout.addWidget(self._title_label)
 
-        value_label = QLabel(value)
-        value_label.setObjectName("stat-number")
-        layout.addWidget(value_label)
+        self._value_label = QLabel(value)
+        self._value_label.setObjectName("stat-number")
+        layout.addWidget(self._value_label)
 
-        sub_label = QLabel(subtitle)
-        sub_label.setObjectName("caption")
-        layout.addWidget(sub_label)
+        self._subtitle_label = QLabel(subtitle)
+        self._subtitle_label.setObjectName("caption")
+        layout.addWidget(self._subtitle_label)
 
         layout.addStretch()
+
+    def update_value(self, value: str, subtitle: str | None = None) -> None:
+        """Update the displayed value and optional subtitle."""
+        self._value_label.setText(value)
+        if subtitle is not None:
+            self._subtitle_label.setText(subtitle)
 
 
 class TrendCard(QFrame):
@@ -155,6 +163,9 @@ class StatisticsPage(QWidget):
         today_minutes = (today_focus % 3600) // 60
         today_str = f"{today_hours}h {today_minutes}m"
 
+        # Get blink rate stats if available
+        blink_stats = self._get_blink_statistics()
+
         # Summary cards
         summary_data = [
             ("Total Screen Time", time_str, "All time"),
@@ -163,8 +174,16 @@ class StatisticsPage(QWidget):
             ("Sessions Tracked", str(total_sessions), "All time"),
         ]
 
-        for title, value, subtitle in summary_data:
-            card = StatCard(title, value, subtitle)
+        if blink_stats:
+            avg_rate = blink_stats.get("avg_rate")
+            rate_str = f"{avg_rate:.1f}/min" if avg_rate else "--"
+            sessions_count = blink_stats["total_sessions"]
+            summary_data.append(
+                ("Avg Blink Rate", rate_str, f"{sessions_count} sessions")
+            )
+
+        for title_text, value, subtitle in summary_data:
+            card = StatCard(title_text, value, subtitle)
             self._summary_container.addWidget(card)
             self._summary_cards.append(card)
 
@@ -174,9 +193,77 @@ class StatisticsPage(QWidget):
             ("Breaks Taken", f"Completed {total_breaks} focus sessions total."),
             ("Session History", f"{total_sessions} sessions tracked total."),
         ]
+
+        if blink_stats:
+            avg_rate = blink_stats.get("avg_rate")
+            if avg_rate:
+                trends.append(
+                    (
+                        "Blink Rate",
+                        f"Average blink rate: {avg_rate:.1f}/min across "
+                        f"{blink_stats['total_sessions']} monitoring sessions.",
+                    )
+                )
+            else:
+                trends.append(
+                    (
+                        "Blink Rate",
+                        "No blink data yet. Start Smart Mode to track blink rate.",
+                    )
+                )
+        else:
+            trends.append(
+                (
+                    "Blink Rate",
+                    "No blink data yet. Enable Smart Mode to track blink rate.",
+                )
+            )
+
         for trend_title, msg in trends:
             trend_card = TrendCard(trend_title, msg)
             self._trends_container.addWidget(trend_card)
+
+    def _get_blink_statistics(self) -> dict | None:
+        """Get blink rate statistics from monitoring sessions."""
+        if self.deps.monitoring_repository is None:
+            return None
+
+        try:
+            sessions = self.deps.monitoring_repository.get_recent_sessions(limit=100)
+            if not sessions:
+                return None
+
+            total_blinks = 0
+            total_duration = 0.0
+            rates: list[float] = []
+
+            for session in sessions:
+                if session.total_blinks is not None:
+                    total_blinks += cast(int, session.total_blinks)
+                if session.duration_seconds is not None:
+                    total_duration += cast(float, session.duration_seconds)
+                if (
+                    session.average_blink_rate is not None
+                    and session.valid_observation_seconds is not None
+                    and cast(float, session.valid_observation_seconds) > 0
+                ):
+                    rates.append(cast(float, session.average_blink_rate))
+
+            if not rates:
+                return {
+                    "total_sessions": len(sessions),
+                    "total_blinks": total_blinks,
+                    "avg_rate": None,
+                }
+
+            avg_rate = sum(rates) / len(rates)
+            return {
+                "total_sessions": len(sessions),
+                "total_blinks": total_blinks,
+                "avg_rate": avg_rate,
+            }
+        except Exception:
+            return None
 
     def _show_placeholder_stats(self) -> None:
         """Show placeholder stats when no repository is available."""
@@ -186,8 +273,8 @@ class StatisticsPage(QWidget):
             ("Breaks Completed", "0", "This week"),
             ("Sessions Tracked", "0", "All time"),
         ]
-        for title, value, subtitle in summary_data:
-            card = StatCard(title, value, subtitle)
+        for title_text, value, subtitle in summary_data:
+            card = StatCard(title_text, value, subtitle)
             self._summary_container.addWidget(card)
 
         trends = [

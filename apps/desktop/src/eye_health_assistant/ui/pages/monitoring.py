@@ -1,10 +1,11 @@
-"""Monitoring page — live timer display and controls."""
+"""Monitoring page — live timer display, Smart Mode, and controls."""
 
 from __future__ import annotations
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtWidgets import (
     QFrame,
+    QGridLayout,
     QHBoxLayout,
     QLabel,
     QPushButton,
@@ -12,28 +13,215 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from eye_health_assistant.app.dependencies import Dependencies
 from eye_health_assistant.domain.enums import TimerPhase
 from eye_health_assistant.domain.models.timer_session import TimerSession
 from eye_health_assistant.timer.controller import TimerController
+from eye_health_assistant.ui.widgets.camera_preview import CameraPreview
+
+
+class SmartModePanel(QFrame):
+    """Smart Mode camera monitoring panel."""
+
+    def __init__(self, deps: Dependencies, parent: QWidget | None = None) -> None:
+        super().__init__(parent)
+        self.deps = deps
+        self._is_active = False
+        self.setObjectName("card")
+        self.setFrameShape(QFrame.Shape.NoFrame)
+        self._build_ui()
+        self._connect_signals()
+
+    def _build_ui(self) -> None:
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.setSpacing(16)
+
+        # Header
+        header = QHBoxLayout()
+        title = QLabel("Smart Mode (Camera)")
+        title.setObjectName("section-title")
+        header.addWidget(title)
+        header.addStretch()
+
+        self._status_badge = QLabel("OFF")
+        self._status_badge.setObjectName("caption")
+        header.addWidget(self._status_badge)
+
+        layout.addLayout(header)
+
+        # Info row
+        info = QLabel(
+            "Track your blink rate and eye wellness using your webcam. "
+            "Camera data is processed locally and never stored."
+        )
+        info.setObjectName("subtitle")
+        info.setWordWrap(True)
+        layout.addWidget(info)
+
+        # Camera preview
+        self._preview = CameraPreview()
+        layout.addWidget(self._preview)
+
+        # Metrics grid
+        metrics_grid = QGridLayout()
+        metrics_grid.setSpacing(16)
+
+        # Face detection
+        face_layout = QVBoxLayout()
+        face_layout.setSpacing(4)
+        face_label = QLabel("Face Detection")
+        face_label.setObjectName("caption")
+        face_layout.addWidget(face_label)
+        self._face_status = QLabel("--")
+        self._face_status.setObjectName("stat-number")
+        face_layout.addWidget(self._face_status)
+        metrics_grid.addLayout(face_layout, 0, 0)
+
+        # Blink rate
+        blink_layout = QVBoxLayout()
+        blink_layout.setSpacing(4)
+        blink_label = QLabel("Blink Rate")
+        blink_label.setObjectName("caption")
+        blink_layout.addWidget(blink_label)
+        self._blink_rate = QLabel("--")
+        self._blink_rate.setObjectName("stat-number")
+        blink_layout.addWidget(self._blink_rate)
+        metrics_grid.addLayout(blink_layout, 0, 1)
+
+        # Eye openness
+        eye_layout = QVBoxLayout()
+        eye_layout.setSpacing(4)
+        eye_label = QLabel("Eye Openness")
+        eye_label.setObjectName("caption")
+        eye_layout.addWidget(eye_label)
+        self._eye_openness = QLabel("--")
+        self._eye_openness.setObjectName("stat-number")
+        eye_layout.addWidget(self._eye_openness)
+        metrics_grid.addLayout(eye_layout, 0, 2)
+
+        # Total blinks
+        total_layout = QVBoxLayout()
+        total_layout.setSpacing(4)
+        total_label = QLabel("Total Blinks")
+        total_label.setObjectName("caption")
+        total_layout.addWidget(total_label)
+        self._total_blinks = QLabel("0")
+        self._total_blinks.setObjectName("stat-number")
+        total_layout.addWidget(self._total_blinks)
+        metrics_grid.addLayout(total_layout, 1, 0)
+
+        layout.addLayout(metrics_grid)
+
+        # Controls
+        controls_layout = QHBoxLayout()
+        controls_layout.setSpacing(10)
+
+        self._start_btn = QPushButton("Start Smart Mode")
+        self._start_btn.clicked.connect(self._toggle_monitoring)
+        controls_layout.addWidget(self._start_btn)
+
+        controls_layout.addStretch()
+        layout.addLayout(controls_layout)
+
+    def _connect_signals(self) -> None:
+        """Connect to monitoring service signals."""
+        if self.deps.monitoring_service is None:
+            return
+
+        service = self.deps.monitoring_service
+        service.monitoring_started.connect(self._on_started)
+        service.monitoring_stopped.connect(self._on_stopped)
+        service.face_state_changed.connect(self._on_face_changed)
+        service.blink_rate_updated.connect(self._on_blink_rate)
+        service.eye_openness_updated.connect(self._on_eye_openness)
+        service.frame_available.connect(self._preview.update_frame)
+        service.face_landmarks_available.connect(self._preview.set_face)
+        service.error_occurred.connect(self._on_error)
+
+    @Slot()
+    def _toggle_monitoring(self) -> None:
+        if self.deps.monitoring_service is None:
+            return
+
+        if self._is_active:
+            self.deps.monitoring_service.stop()
+        else:
+            self.deps.monitoring_service.start()
+
+    @Slot()
+    def _on_started(self) -> None:
+        self._is_active = True
+        self._status_badge.setText("ACTIVE")
+        self._status_badge.setStyleSheet("color: #4CAF50;")
+        self._start_btn.setText("Stop Smart Mode")
+        self._face_status.setText("Scanning...")
+        self._blink_rate.setText("...")
+        self._eye_openness.setText("...")
+        self._total_blinks.setText("0")
+
+    @Slot()
+    def _on_stopped(self) -> None:
+        self._is_active = False
+        self._status_badge.setText("OFF")
+        self._status_badge.setStyleSheet("")
+        self._start_btn.setText("Start Smart Mode")
+        self._face_status.setText("--")
+        self._blink_rate.setText("--")
+        self._eye_openness.setText("--")
+        self._total_blinks.setText("0")
+        self._preview.clear()
+
+    @Slot(bool)
+    def _on_face_changed(self, detected: bool) -> None:
+        if detected:
+            self._face_status.setText("Detected")
+            self._face_status.setStyleSheet("color: #4CAF50;")
+        else:
+            self._face_status.setText("Not Found")
+            self._face_status.setStyleSheet("color: #FF9800;")
+
+    @Slot(object, int)
+    def _on_blink_rate(self, rate: float | None, total: int) -> None:
+        if rate is not None:
+            self._blink_rate.setText(f"{rate:.1f}/min")
+        else:
+            self._blink_rate.setText("Measuring...")
+        self._total_blinks.setText(str(total))
+
+    @Slot(object)
+    def _on_eye_openness(self, openness: float | None) -> None:
+        if openness is not None:
+            self._eye_openness.setText(f"{openness:.2f}")
+        else:
+            self._eye_openness.setText("N/A")
+
+    @Slot(str)
+    def _on_error(self, _message: str) -> None:
+        self._status_badge.setText("ERROR")
+        self._status_badge.setStyleSheet("color: #F44336;")
+        self._start_btn.setText("Start Smart Mode")
+        self._face_status.setText("Error")
 
 
 class MonitoringPage(QWidget):
-    """Live monitoring page with timer display and controls."""
+    """Live monitoring page with timer and Smart Mode."""
 
     navigate_to_settings = Signal()
 
     def __init__(
         self,
+        deps: Dependencies,
         timer_controller: TimerController,
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
+        self.deps = deps
         self._timer = timer_controller
         self._setup_ui()
         self._connect_signals()
 
     def _setup_ui(self) -> None:
-        """Build the monitoring page layout."""
         layout = QVBoxLayout(self)
         layout.setContentsMargins(36, 28, 36, 28)
         layout.setSpacing(28)
@@ -43,9 +231,13 @@ class MonitoringPage(QWidget):
         header.setObjectName("pageTitle")
         layout.addWidget(header)
 
-        # Timer display card
+        # Timer section
         timer_card = self._create_timer_card()
         layout.addWidget(timer_card)
+
+        # Smart Mode section
+        self._smart_panel = SmartModePanel(deps=self.deps)
+        layout.addWidget(self._smart_panel)
 
         # Status card
         status_card = self._create_status_card()

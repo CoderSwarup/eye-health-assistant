@@ -46,8 +46,21 @@ class Config:
     min_notification_interval: int = 300  # 5 minutes in seconds
 
     # Smart mode (camera)
+    camera_enabled: bool = False
+    camera_device_index: int = 0
+    camera_preview_enabled: bool = True
+    smart_mode_default: bool = False
+    sampling_fps: int = 10  # frames per second to process
+    min_observation_seconds: int = 30
+    sustained_low_blink_seconds: int = 120  # 2 minutes before reminder
+    score_algorithm_version: str = "1.0"
+
+    # Blink detection thresholds
     blink_rate_threshold: float = 15.0  # blinks per minute
     rolling_window_minutes: int = 3
+    ear_close_threshold: float = 0.22
+    ear_open_threshold: float = 0.28
+    ear_closed_threshold: float = 0.20
 
     def __post_init__(self) -> None:
         if self.database_path is None:

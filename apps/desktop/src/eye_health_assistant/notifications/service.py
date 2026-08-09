@@ -44,6 +44,16 @@ class NotificationService:
             + ". Great work!",
         )
 
+    def notify_blink_reminder(self) -> None:
+        """Send a gentle reminder about low blink rate."""
+        if not self._config.notifications_enabled:
+            return
+        self._send(
+            "Eye Wellness Reminder",
+            "You've been focused for a while. "
+            "Try a few relaxed blinks or take a short visual break.",
+        )
+
     def _send(self, title: str, message: str) -> None:
         """Send a desktop notification."""
         logger.info("Notification: %s — %s", title, message)

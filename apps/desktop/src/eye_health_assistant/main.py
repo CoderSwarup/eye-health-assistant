@@ -29,15 +29,15 @@ def main() -> int:
     signal.signal(signal.SIGINT, _handle_sigint)
     signal.signal(signal.SIGTERM, _handle_sigint)
 
-    # Initialize dependencies
-    deps = Dependencies()
-    deps.initialize()
-
-    # Create Qt application
+    # Create Qt application FIRST
     app = QApplication(sys.argv)
     app.setApplicationName("Eye Health Assistant")
     app.setOrganizationName("EyeHealthAssistant")
     app.setApplicationVersion("0.1.0")
+
+    # Initialize dependencies AFTER QApplication exists
+    deps = Dependencies()
+    deps.initialize(parent=app)
 
     # Create and show main window
     window = MainWindow(deps=deps)

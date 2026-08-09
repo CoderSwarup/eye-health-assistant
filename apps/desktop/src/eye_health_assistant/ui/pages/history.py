@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -68,6 +70,83 @@ class SessionCard(QFrame):
         )
         sessions_label.setObjectName("caption")
         detail_row.addWidget(sessions_label)
+
+        detail_row.addStretch()
+        info_layout.addLayout(detail_row)
+
+        layout.addLayout(info_layout, 1)
+
+        delete_btn = QPushButton("Delete")
+        delete_btn.setObjectName("danger-button")
+        layout.addWidget(delete_btn)
+
+
+class MonitoringSessionCard(QFrame):
+    """Card for a monitoring session."""
+
+    def __init__(
+        self,
+        _session_id: str,
+        _device_index: int,
+        started_at: str,
+        duration: float | None,
+        total_blinks: int | None,
+        avg_rate: float | None,
+        status: str,
+        parent: QWidget | None = None,
+    ) -> None:
+        super().__init__(parent)
+        self.setObjectName("card")
+        self.setFrameShape(QFrame.Shape.NoFrame)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.setMinimumHeight(80)
+
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(16)
+
+        info_layout = QVBoxLayout()
+        info_layout.setSpacing(4)
+
+        header_row = QHBoxLayout()
+        header_row.setSpacing(12)
+
+        mode_label = QLabel("Smart Mode")
+        mode_label.setObjectName("section-title")
+        header_row.addWidget(mode_label)
+        header_row.addStretch()
+
+        date_label = QLabel(started_at)
+        date_label.setObjectName("caption")
+        header_row.addWidget(date_label)
+
+        info_layout.addLayout(header_row)
+
+        detail_row = QHBoxLayout()
+        detail_row.setSpacing(16)
+
+        if duration is not None:
+            duration_min = int(duration) // 60
+            duration_sec = int(duration) % 60
+            duration_label = QLabel(f"Duration: {duration_min}m {duration_sec}s")
+        else:
+            duration_label = QLabel("Duration: Active")
+        duration_label.setObjectName("subtitle")
+        detail_row.addWidget(duration_label)
+
+        if total_blinks is not None:
+            blinks_label = QLabel(f"Blinks: {total_blinks}")
+            blinks_label.setObjectName("caption")
+            detail_row.addWidget(blinks_label)
+
+        if avg_rate is not None:
+            rate_label = QLabel(f"Avg Rate: {avg_rate:.1f}/min")
+            rate_label.setObjectName("caption")
+            detail_row.addWidget(rate_label)
+
+        status_label = QLabel(f"Status: {status.title()}")
+        status_label.setObjectName("caption")
+        detail_row.addWidget(status_label)
 
         detail_row.addStretch()
         info_layout.addLayout(detail_row)
@@ -152,6 +231,16 @@ class HistoryPage(QWidget):
 
         sessions = self.deps.session_repository.get_recent(limit=50)
 
+        # Get monitoring sessions
+        monitoring_sessions = []
+        if self.deps.monitoring_repository is not None:
+            try:
+                monitoring_sessions = (
+                    self.deps.monitoring_repository.get_recent_sessions(limit=20)
+                )
+            except Exception:
+                monitoring_sessions = []
+
         # Clear existing cards
         if self._session_list_layout:
             while self._session_list_layout.count():
@@ -161,16 +250,37 @@ class HistoryPage(QWidget):
                     if widget is not None:
                         widget.setParent(None)
 
-        if sessions:
+        # Add monitoring sessions
+        for ms in monitoring_sessions:
+            if ms.started_at:
+                started_at = ms.started_at.strftime("%Y-%m-%d %H:%M")
+            else:
+                started_at = "Unknown"
+            monitoring_card = MonitoringSessionCard(
+                _session_id=cast(str, ms.id),
+                _device_index=cast(int, ms.device_index),
+                started_at=started_at,
+                duration=cast(float | None, ms.duration_seconds),
+                total_blinks=cast(int | None, ms.total_blinks),
+                avg_rate=cast(float | None, ms.average_blink_rate),
+                status=cast(str, ms.status),
+            )
+            if self._session_list_layout:
+                self._session_list_layout.addWidget(monitoring_card)
+
+        # Add timer sessions
+        for session in sessions:
+            timer_card = SessionCard(session)
+            if self._session_list_layout:
+                self._session_list_layout.addWidget(timer_card)
+
+        has_sessions = bool(sessions or monitoring_sessions)
+
+        if has_sessions:
             if self._session_list:
                 self._session_list.show()
             if self._empty_state:
                 self._empty_state.hide()
-
-            if self._session_list_layout:
-                for session in sessions:
-                    card = SessionCard(session)
-                    self._session_list_layout.addWidget(card)
         else:
             if self._session_list:
                 self._session_list.hide()

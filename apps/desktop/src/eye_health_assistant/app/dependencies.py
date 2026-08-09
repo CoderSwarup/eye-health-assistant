@@ -9,7 +9,11 @@ from PySide6.QtCore import QObject
 
 from eye_health_assistant.app.lifecycle import ApplicationLifecycle
 from eye_health_assistant.core.config import Config
+from eye_health_assistant.infrastructure.database.monitoring_repository import (
+    MonitoringRepository,
+)
 from eye_health_assistant.infrastructure.database.repository import SessionRepository
+from eye_health_assistant.monitoring.service import MonitoringService
 from eye_health_assistant.notifications.service import NotificationService
 from eye_health_assistant.timer.controller import TimerController
 
@@ -27,8 +31,10 @@ class Dependencies:
     config: Config = field(default_factory=Config)
     lifecycle: ApplicationLifecycle | None = None
     session_repository: SessionRepository | None = None
+    monitoring_repository: MonitoringRepository | None = None
     notification_service: NotificationService | None = None
     timer_controller: TimerController | None = None
+    monitoring_service: MonitoringService | None = None
 
     def initialize(self, parent: QObject | None = None) -> None:
         """Initialize all dependencies."""
@@ -40,9 +46,20 @@ class Dependencies:
             self.session_repository = SessionRepository(
                 self.lifecycle.database
             )
+            self.monitoring_repository = MonitoringRepository(
+                self.lifecycle.database
+            )
 
         # Create services
         self.notification_service = NotificationService(self.config)
+
+        # Create monitoring service
+        if self.notification_service:
+            self.monitoring_service = MonitoringService(
+                config=self.config,
+                notification_service=self.notification_service,
+                parent=parent,
+            )
 
         # Create controllers
         if self.session_repository and self.notification_service:
@@ -56,6 +73,8 @@ class Dependencies:
 
     def shutdown(self) -> None:
         """Shut down all dependencies."""
+        if self.monitoring_service and self.monitoring_service.is_active:
+            self.monitoring_service.stop()
         if self.timer_controller and self.timer_controller.is_running:
             self.timer_controller.stop()
         if self.lifecycle:

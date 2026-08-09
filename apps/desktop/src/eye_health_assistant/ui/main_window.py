@@ -137,7 +137,8 @@ class MainWindow(QMainWindow):
 
         if self.deps.timer_controller:
             monitoring = MonitoringPage(
-                timer_controller=self.deps.timer_controller
+                deps=self.deps,
+                timer_controller=self.deps.timer_controller,
             )
             self.pages["monitoring"] = monitoring
 
