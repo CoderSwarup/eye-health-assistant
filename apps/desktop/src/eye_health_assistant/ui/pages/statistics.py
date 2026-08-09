@@ -1,8 +1,6 @@
-"""Statistics page — usage metrics and trends."""
+"""Statistics page — usage metrics, trends, and charts."""
 
 from __future__ import annotations
-
-from typing import cast
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
@@ -10,278 +8,371 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QPushButton,
-    QSizePolicy,
+    QScrollArea,
     QVBoxLayout,
     QWidget,
 )
 
+from eye_health_assistant.analytics.service import (
+    ComparisonResult,
+    PeriodSummary,
+    TimePeriod,
+)
 from eye_health_assistant.app.dependencies import Dependencies
-
-
-class StatCard(QFrame):
-    """Summary metric card."""
-
-    def __init__(
-        self,
-        title: str,
-        value: str,
-        subtitle: str,
-        parent: QWidget | None = None,
-    ) -> None:
-        super().__init__(parent)
-        self.setObjectName("metric-card")
-        self.setFrameShape(QFrame.Shape.NoFrame)
-        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        self.setMinimumHeight(100)
-
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(4)
-
-        self._title_label = QLabel(title)
-        self._title_label.setObjectName("caption")
-        layout.addWidget(self._title_label)
-
-        self._value_label = QLabel(value)
-        self._value_label.setObjectName("stat-number")
-        layout.addWidget(self._value_label)
-
-        self._subtitle_label = QLabel(subtitle)
-        self._subtitle_label.setObjectName("caption")
-        layout.addWidget(self._subtitle_label)
-
-        layout.addStretch()
-
-    def update_value(self, value: str, subtitle: str | None = None) -> None:
-        """Update the displayed value and optional subtitle."""
-        self._value_label.setText(value)
-        if subtitle is not None:
-            self._subtitle_label.setText(subtitle)
-
-
-class TrendCard(QFrame):
-    """Trend section card."""
-
-    def __init__(self, title: str, message: str, parent: QWidget | None = None) -> None:
-        super().__init__(parent)
-        self.setObjectName("card")
-        self.setFrameShape(QFrame.Shape.NoFrame)
-        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        self.setMinimumHeight(120)
-
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(8)
-
-        header = QHBoxLayout()
-        title_label = QLabel(title)
-        title_label.setObjectName("section-title")
-        header.addWidget(title_label)
-        header.addStretch()
-        layout.addLayout(header)
-
-        msg_label = QLabel(message)
-        msg_label.setObjectName("subtitle")
-        msg_label.setWordWrap(True)
-        layout.addWidget(msg_label)
-
-        chart_placeholder = QLabel("Chart will appear here with data.")
-        chart_placeholder.setObjectName("caption")
-        chart_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        chart_placeholder.setMinimumHeight(60)
-        layout.addWidget(chart_placeholder)
+from eye_health_assistant.ui.charts import (
+    BarChartWidget,
+    ChartDataPoint,
+    ChartSeries,
+    LineChartWidget,
+    SummaryCard,
+)
 
 
 class StatisticsPage(QWidget):
-    """Statistics and analytics page."""
+    """Statistics and analytics page with charts."""
 
     def __init__(self, deps: Dependencies, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self.deps = deps
-        self._summary_cards: list[StatCard] = []
+        self._current_period = TimePeriod.WEEK
+        self._summary_cards: list[SummaryCard] = []
+        self._activity_chart: BarChartWidget | None = None
+        self._blink_chart: LineChartWidget | None = None
+        self._period_btns: list[QPushButton] = []
         self._build_ui()
         self._load_statistics()
 
     def _build_ui(self) -> None:
-        layout = QVBoxLayout(self)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+
+        content = QWidget()
+        layout = QVBoxLayout(content)
         layout.setContentsMargins(36, 28, 36, 28)
         layout.setSpacing(28)
 
+        # Header
         header = QHBoxLayout()
         title = QLabel("Statistics")
         title.setObjectName("page-title")
         header.addWidget(title)
         header.addStretch()
 
-        period_btns = QHBoxLayout()
-        period_btns.setSpacing(10)
-        for label in ["Daily", "Weekly", "Monthly"]:
+        # Period selector
+        period_layout = QHBoxLayout()
+        period_layout.setSpacing(10)
+        for label, period in [
+            ("Today", TimePeriod.TODAY),
+            ("7 Days", TimePeriod.WEEK),
+            ("30 Days", TimePeriod.MONTH),
+        ]:
             btn = QPushButton(label)
             btn.setObjectName("secondary-button")
-            period_btns.addWidget(btn)
-        header.addLayout(period_btns)
+            btn.clicked.connect(
+                lambda _checked, p=period: self._on_period_changed(p)
+            )
+            period_layout.addWidget(btn)
+            self._period_btns.append(btn)
+        header.addLayout(period_layout)
 
         layout.addLayout(header)
 
         # Summary metrics
-        summary_layout = QHBoxLayout()
-        summary_layout.setSpacing(16)
-        self._summary_container = summary_layout
-        layout.addLayout(summary_layout)
+        self._summary_container = QHBoxLayout()
+        self._summary_container.setSpacing(16)
+        layout.addLayout(self._summary_container)
 
-        # Trend cards
-        self._trends_container = QVBoxLayout()
-        self._trends_container.setSpacing(16)
-        layout.addLayout(self._trends_container)
+        # Charts section
+        charts_layout = QHBoxLayout()
+        charts_layout.setSpacing(16)
 
-        export_btn = QPushButton("Export Data")
+        self._activity_chart = BarChartWidget("Activity Overview")
+        charts_layout.addWidget(self._activity_chart)
+
+        self._blink_chart = LineChartWidget("Blink Rate Trend")
+        charts_layout.addWidget(self._blink_chart)
+
+        layout.addLayout(charts_layout)
+
+        # Comparison section
+        self._comparison_frame = QFrame()
+        self._comparison_frame.setObjectName("card")
+        self._comparison_frame.setFrameShape(QFrame.Shape.NoFrame)
+        self._comparison_layout = QVBoxLayout(self._comparison_frame)
+        self._comparison_layout.setContentsMargins(0, 0, 0, 0)
+        self._comparison_layout.setSpacing(8)
+        layout.addWidget(self._comparison_frame)
+
+        # Export button
+        export_btn = QPushButton("Export Data (JSON)")
         export_btn.setObjectName("secondary-button")
+        export_btn.clicked.connect(self._on_export)
         layout.addWidget(export_btn)
+
+        # Delete button
+        delete_btn = QPushButton("Delete All Data")
+        delete_btn.setObjectName("danger-button")
+        delete_btn.clicked.connect(self._on_delete_all)
+        layout.addWidget(delete_btn)
+
+        # Privacy note
+        privacy_label = QLabel(
+            "Your activity history is stored locally on this device."
+        )
+        privacy_label.setObjectName("caption")
+        privacy_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(privacy_label)
 
         layout.addStretch()
 
+        scroll.setWidget(content)
+
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.addWidget(scroll)
+
+    def _on_period_changed(self, period: TimePeriod) -> None:
+        """Handle period selector change."""
+        self._current_period = period
+        self._load_statistics()
+
     def _load_statistics(self) -> None:
-        """Load statistics from the database."""
-        if self.deps.session_repository is None:
+        """Load statistics from the analytics service."""
+        if self.deps.analytics_service is None:
             self._show_placeholder_stats()
             return
 
-        sessions = self.deps.session_repository.get_recent(limit=100)
-        today_sessions = self.deps.session_repository.get_today()
+        service = self.deps.analytics_service
+        summary = service.get_summary(self._current_period)
+        comparison = service.get_comparison(self._current_period)
+        daily = service.get_daily_trend(self._current_period)
 
-        # Calculate summary metrics
-        total_focus_time = sum(s.focus_duration for s in sessions)
-        total_breaks = sum(s.completed_focus_sessions for s in sessions)
-        total_sessions = len(sessions)
+        # Update summary cards
+        self._update_summary_cards(summary, comparison)
 
-        total_hours = total_focus_time // 3600
-        total_minutes = (total_focus_time % 3600) // 60
-        time_str = f"{total_hours}h {total_minutes}m"
+        # Update charts
+        self._update_activity_chart(daily)
+        self._update_blink_chart(daily)
 
-        today_focus = sum(s.focus_duration for s in today_sessions)
-        today_hours = today_focus // 3600
-        today_minutes = (today_focus % 3600) // 60
-        today_str = f"{today_hours}h {today_minutes}m"
+        # Update comparison
+        self._update_comparison(comparison)
 
-        # Get blink rate stats if available
-        blink_stats = self._get_blink_statistics()
+    def _update_summary_cards(
+        self,
+        summary: PeriodSummary,
+        _comparison: ComparisonResult | None,
+    ) -> None:
+        """Update the summary metric cards."""
+        # Clear existing cards
+        while self._summary_container.count():
+            item = self._summary_container.takeAt(0)
+            if item is not None:
+                widget = item.widget()
+                if widget is not None:
+                    widget.setParent(None)
 
-        # Summary cards
-        summary_data = [
-            ("Total Screen Time", time_str, "All time"),
-            ("Today's Focus", today_str, "Today"),
-            ("Breaks Completed", str(total_breaks), "All time"),
-            ("Sessions Tracked", str(total_sessions), "All time"),
+        self._summary_cards.clear()
+
+        period_label = {
+            TimePeriod.TODAY: "Today",
+            TimePeriod.WEEK: "This Week",
+            TimePeriod.MONTH: "This Month",
+            TimePeriod.ALL: "All Time",
+        }.get(summary.period, "")
+
+        cards_data = [
+            ("Focus Time", summary.focus_hours_display, period_label),
+            ("Break Time", summary.break_hours_display, period_label),
+            ("Breaks Completed", str(summary.focus_sessions_completed), period_label),
+            ("Smart Monitoring", summary.monitoring_hours_display, period_label),
+            ("Estimated Blink Rate", summary.blink_rate_display, period_label),
+            ("Active Days", str(summary.active_days), period_label),
         ]
 
-        if blink_stats:
-            avg_rate = blink_stats.get("avg_rate")
-            rate_str = f"{avg_rate:.1f}/min" if avg_rate else "--"
-            sessions_count = blink_stats["total_sessions"]
-            summary_data.append(
-                ("Avg Blink Rate", rate_str, f"{sessions_count} sessions")
-            )
-
-        for title_text, value, subtitle in summary_data:
-            card = StatCard(title_text, value, subtitle)
+        for title, value, subtitle in cards_data:
+            card = SummaryCard(title, value, subtitle)
             self._summary_container.addWidget(card)
             self._summary_cards.append(card)
 
-        # Trend cards
-        trends = [
-            ("Screen Time", "Complete more sessions to see screen time trends."),
-            ("Breaks Taken", f"Completed {total_breaks} focus sessions total."),
-            ("Session History", f"{total_sessions} sessions tracked total."),
-        ]
+    def _update_activity_chart(self, daily: list) -> None:
+        """Update the activity bar chart."""
+        if self._activity_chart is None:
+            return
 
-        if blink_stats:
-            avg_rate = blink_stats.get("avg_rate")
-            if avg_rate:
-                trends.append(
-                    (
-                        "Blink Rate",
-                        f"Average blink rate: {avg_rate:.1f}/min across "
-                        f"{blink_stats['total_sessions']} monitoring sessions.",
-                    )
-                )
-            else:
-                trends.append(
-                    (
-                        "Blink Rate",
-                        "No blink data yet. Start Smart Mode to track blink rate.",
-                    )
-                )
-        else:
-            trends.append(
-                (
-                    "Blink Rate",
-                    "No blink data yet. Enable Smart Mode to track blink rate.",
+        points = []
+        for d in daily[-7:]:  # Last 7 days
+            label = d.date.strftime("%a")
+            points.append(
+                ChartDataPoint(
+                    label=label,
+                    value=d.focus_seconds / 60.0,  # Convert to minutes
                 )
             )
 
-        for trend_title, msg in trends:
-            trend_card = TrendCard(trend_title, msg)
-            self._trends_container.addWidget(trend_card)
+        if points:
+            self._activity_chart.set_data(
+                ChartSeries(name="Focus Minutes", points=points, color="#4A90D9")
+            )
+        else:
+            self._activity_chart.set_data(
+                ChartSeries(name="No Data", points=[])
+            )
 
-    def _get_blink_statistics(self) -> dict | None:
-        """Get blink rate statistics from monitoring sessions."""
-        if self.deps.monitoring_repository is None:
-            return None
+    def _update_blink_chart(self, daily: list) -> None:
+        """Update the blink rate line chart."""
+        if self._blink_chart is None:
+            return
 
-        try:
-            sessions = self.deps.monitoring_repository.get_recent_sessions(limit=100)
-            if not sessions:
-                return None
+        points = []
+        for d in daily[-7:]:  # Last 7 days
+            label = d.date.strftime("%a")
+            rate = d.avg_blink_rate if d.avg_blink_rate else 0.0
+            points.append(ChartDataPoint(label=label, value=rate))
 
-            total_blinks = 0
-            total_duration = 0.0
-            rates: list[float] = []
+        if points:
+            self._blink_chart.set_data([
+                ChartSeries(name="Blink Rate", points=points, color="#E8913A")
+            ])
+        else:
+            self._blink_chart.set_data([
+                ChartSeries(name="No Data", points=[])
+            ])
 
-            for session in sessions:
-                if session.total_blinks is not None:
-                    total_blinks += cast(int, session.total_blinks)
-                if session.duration_seconds is not None:
-                    total_duration += cast(float, session.duration_seconds)
-                if (
-                    session.average_blink_rate is not None
-                    and session.valid_observation_seconds is not None
-                    and cast(float, session.valid_observation_seconds) > 0
-                ):
-                    rates.append(cast(float, session.average_blink_rate))
+    def _update_comparison(self, comparison: ComparisonResult | None) -> None:
+        """Update the comparison section."""
+        if self._comparison_frame is None:
+            return
 
-            if not rates:
-                return {
-                    "total_sessions": len(sessions),
-                    "total_blinks": total_blinks,
-                    "avg_rate": None,
-                }
+        # Clear existing
+        while self._comparison_layout.count():
+            item = self._comparison_layout.takeAt(0)
+            if item is not None:
+                widget = item.widget()
+                if widget is not None:
+                    widget.setParent(None)
 
-            avg_rate = sum(rates) / len(rates)
-            return {
-                "total_sessions": len(sessions),
-                "total_blinks": total_blinks,
-                "avg_rate": avg_rate,
-            }
-        except Exception:
-            return None
+        if comparison is None:
+            return
+
+        title = QLabel("Period Comparison")
+        title.setObjectName("section-title")
+        self._comparison_layout.addWidget(title)
+
+        focus_pct = comparison.focus_change_pct
+        break_pct = comparison.break_change_pct
+
+        messages = []
+        if focus_pct is not None:
+            direction = "increased" if focus_pct > 0 else "decreased"
+            messages.append(
+                f"Focus time {direction} by {abs(focus_pct):.0f}% "
+                "compared to previous period."
+            )
+        if break_pct is not None:
+            direction = "increased" if break_pct > 0 else "decreased"
+            messages.append(
+                f"Break time {direction} by {abs(break_pct):.0f}% "
+                "compared to previous period."
+            )
+
+        if not messages:
+            messages.append("Not enough data for comparison.")
+
+        for msg in messages:
+            label = QLabel(msg)
+            label.setObjectName("subtitle")
+            label.setWordWrap(True)
+            self._comparison_layout.addWidget(label)
 
     def _show_placeholder_stats(self) -> None:
-        """Show placeholder stats when no repository is available."""
-        summary_data = [
-            ("Total Screen Time", "0h 0m", "This week"),
-            ("Avg Blink Rate", "--", "Enable Smart Mode"),
-            ("Breaks Completed", "0", "This week"),
-            ("Sessions Tracked", "0", "All time"),
+        """Show placeholder stats when no service is available."""
+        while self._summary_container.count():
+            item = self._summary_container.takeAt(0)
+            if item is not None:
+                widget = item.widget()
+                if widget is not None:
+                    widget.setParent(None)
+
+        placeholders = [
+            ("Focus Time", "--", "No data"),
+            ("Break Time", "--", "No data"),
+            ("Breaks Completed", "--", "No data"),
+            ("Smart Monitoring", "--", "No data"),
+            ("Estimated Blink Rate", "--", "No data"),
         ]
-        for title_text, value, subtitle in summary_data:
-            card = StatCard(title_text, value, subtitle)
+        for title, value, subtitle in placeholders:
+            card = SummaryCard(title, value, subtitle)
             self._summary_container.addWidget(card)
 
-        trends = [
-            ("Screen Time", "No data yet. Complete a session to see trends."),
-            ("Blink Rate", "No data yet. Enable Smart Mode to track blink rate."),
-            ("Breaks Taken", "No data yet. Start a timer to begin tracking breaks."),
-        ]
-        for trend_title, msg in trends:
-            trend_card = TrendCard(trend_title, msg)
-            self._trends_container.addWidget(trend_card)
+    def _on_export(self) -> None:
+        """Export all data as JSON."""
+        import json
+
+        from PySide6.QtWidgets import QFileDialog, QMessageBox
+
+        if self.deps.analytics_service is None:
+            QMessageBox.warning(
+                self,
+                "Export",
+                "Analytics service not available.",
+            )
+            return
+
+        data = self.deps.analytics_service.export_all_data()
+
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Export Data",
+            f"eye_health_data_{__import__('datetime').datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
+            "JSON Files (*.json)",
+        )
+
+        if file_path:
+            try:
+                with open(file_path, "w", encoding="utf-8") as f:
+                    json.dump(data, f, indent=2, ensure_ascii=False)
+                QMessageBox.information(
+                    self,
+                    "Export Complete",
+                    f"Data exported to:\n{file_path}\n\n"
+                    f"Timer sessions: {len(data.get('timer_sessions', []))}\n"
+                    f"Monitoring sessions: {len(data.get('monitoring_sessions', []))}\n"
+                    f"Blink measurements: {len(data.get('blink_measurements', []))}",
+                )
+            except Exception as e:
+                QMessageBox.critical(
+                    self,
+                    "Export Error",
+                    f"Failed to export data:\n{e}",
+                )
+
+    def _on_delete_all(self) -> None:
+        """Delete all data with confirmation."""
+        from PySide6.QtWidgets import QMessageBox
+
+        if self.deps.analytics_service is None:
+            return
+
+        reply = QMessageBox.warning(
+            self,
+            "Delete All Data",
+            "This will permanently delete:\n\n"
+            "- All timer sessions\n"
+            "- All monitoring sessions\n"
+            "- All blink measurements\n"
+            "- All statistics history\n\n"
+            "This action cannot be undone.\n\n"
+            "Are you sure you want to delete all data?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+
+        if reply == QMessageBox.StandardButton.Yes:
+            count = self.deps.analytics_service.delete_all_data()
+            QMessageBox.information(
+                self,
+                "Data Deleted",
+                f"Successfully deleted {count} records.",
+            )
+            self._load_statistics()

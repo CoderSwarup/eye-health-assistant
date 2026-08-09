@@ -145,17 +145,27 @@ PRD. Last updated: 2026-08-09
 
 | #  | Deliverable        | Status      |
 | -- | ------------------ | ----------- |
-| 1  | Daily statistics   | Done — StatisticsPage       |
-| 2  | Weekly statistics  | Done — period toggle        |
-| 3  | Monthly statistics | Done — period toggle        |
-| 4  | Charts             | Not started — needs engine  |
-| 5  | Statistics engine  | Not started                 |
-| 6  | Insights engine    | Not started                 |
-| 7  | Score calculation  | Not started                 |
-| 8  | Historical views   | Done — HistoryPage          |
-| 9  | Data export        | Button only — no impl       |
-| 10 | Data deletion      | Button only — no impl       |
-| 11 | Product metrics    | Not started                 |
+| 1  | Daily statistics   | Done — period-based aggregation |
+| 2  | Weekly statistics  | Done — period selector with Today/7 Days/30 Days |
+| 3  | Monthly statistics | Done — period selector with Today/7 Days/30 Days |
+| 4  | Charts             | Done — BarChartWidget + LineChartWidget (QPainter) |
+| 5  | Statistics engine  | Done — AnalyticsService with aggregation |
+| 6  | Insights engine    | Done — period comparison with % change |
+| 7  | Score calculation  | Deferred — not in PRD v1 scope |
+| 8  | Historical views   | Done — HistoryPage with filtering |
+| 9  | Data export        | Done — JSON export with file dialog |
+| 10 | Data deletion      | Done — delete all with confirmation |
+| 11 | Product metrics    | Done — active days, sessions, blink rate |
+
+**Analytics completed this session:**
+- Analytics service: `AnalyticsService` with daily/weekly/monthly aggregation, comparison logic, export, deletion
+- Charts engine: `BarChartWidget`, `LineChartWidget`, `SummaryCard` using QPainter (no external deps)
+- Statistics page: Period selector, 6 summary cards, activity bar chart, blink rate line chart, comparison section
+- History page: Filtering by All/Timer/Smart Mode, session cards
+- Dashboard: Historical data loading from analytics service
+- Settings: Wired Export Data and Delete All Data buttons with confirmation dialogs
+- Tests: 30 new analytics tests, all passing
+- Quality: ruff clean, mypy clean, 181/181 tests passing
 
 ---
 
@@ -243,11 +253,11 @@ PRD. Last updated: 2026-08-09
 | Phase 3 — Timer Mode  | 8      | 7      | 0           | 1           |
 | Phase 4 — Camera Mode | 11     | 11     | 0           | 0           |
 | Phase 5 — Exercises   | 9      | 9      | 0           | 0           |
-| Phase 6 — Analytics   | 11     | 4      | 0           | 7           |
+| Phase 6 — Analytics   | 11     | 10     | 0           | 1           |
 | Phase 7 — Hardening   | 13     | 3      | 0           | 10          |
 | Phase 8 — Packaging   | 10     | 5      | 0           | 5           |
 | Phase 9 — Website     | 12     | 11     | 0           | 1           |
-| **Total**             | **93** | **70** | **0**       | **23**      |
+| **Total**             | **93** | **76** | **0**       | **17**      |
 
 ---
 
@@ -298,8 +308,14 @@ CURRENT STATE:
   - ExerciseController state machine with countdown, pause, resume, cancel
   - Exercise player page with full UI controls
   - 24 new tests for controller and animation factory
-- Phase 6: Partially done — statistics page, history page, period toggles done
-  - Remaining: charts engine, statistics engine, insights, score calculation, export/delete
+- Phase 6: Complete — analytics service, charts engine, export/delete, period comparison
+  - AnalyticsService with daily/weekly/monthly aggregation, comparison logic
+  - BarChartWidget + LineChartWidget using QPainter (no external dependencies)
+  - Statistics page with period selector, 6 summary cards, activity chart, blink rate chart
+  - History page with All/Timer/Smart Mode filtering
+  - JSON export with file dialog, delete all with confirmation
+  - Dashboard loads historical data from analytics service
+  - 30 new analytics tests, all passing
 - Phase 7: Partially done — Result type, exceptions, logging, UI states for all screens
   - Remaining: accessibility, performance, database migrations, privacy/security review, system tray
 - Phase 8: Partially done — docs, troubleshooting, versioning, release process, PyInstaller build working
@@ -323,10 +339,10 @@ WEB STYLING RULES (CRITICAL):
 
 WHAT TO WORK ON NEXT (priority order):
 1. Website: Roadmap section
-2. Charts engine and statistics engine
-3. Database migrations
-4. Packaging: macOS .dmg, Windows .exe installer, release workflow
-5. Accessibility and performance optimization
+2. Database migrations
+3. Packaging: macOS .dmg, Windows .exe installer, release workflow
+4. Accessibility and performance optimization
+5. Onboarding flow (Phase 3 remaining)
 
 PRIVACY RULES (NON-NEGOTIABLE):
 - Never persist webcam frames

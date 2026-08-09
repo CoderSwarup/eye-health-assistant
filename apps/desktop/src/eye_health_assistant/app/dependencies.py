@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 
 from PySide6.QtCore import QObject
 
+from eye_health_assistant.analytics.service import AnalyticsService
 from eye_health_assistant.app.lifecycle import ApplicationLifecycle
 from eye_health_assistant.core.config import Config
 from eye_health_assistant.infrastructure.database.monitoring_repository import (
@@ -35,6 +36,7 @@ class Dependencies:
     notification_service: NotificationService | None = None
     timer_controller: TimerController | None = None
     monitoring_service: MonitoringService | None = None
+    analytics_service: AnalyticsService | None = None
 
     def initialize(self, parent: QObject | None = None) -> None:
         """Initialize all dependencies."""
@@ -47,6 +49,9 @@ class Dependencies:
                 self.lifecycle.database
             )
             self.monitoring_repository = MonitoringRepository(
+                self.lifecycle.database
+            )
+            self.analytics_service = AnalyticsService(
                 self.lifecycle.database
             )
 

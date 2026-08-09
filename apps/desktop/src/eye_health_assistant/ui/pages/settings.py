@@ -205,13 +205,15 @@ class SettingsPage(QWidget):
         # --- Data ---
         data_card, data_layout = _build_section("Data")
 
-        export_btn = QPushButton("Export Data")
-        export_btn.setObjectName("secondary-button")
-        data_layout.addWidget(export_btn)
+        self._export_btn = QPushButton("Export Data")
+        self._export_btn.setObjectName("secondary-button")
+        self._export_btn.clicked.connect(self._on_export)
+        data_layout.addWidget(self._export_btn)
 
-        delete_btn = QPushButton("Delete All Data")
-        delete_btn.setObjectName("danger-button")
-        data_layout.addWidget(delete_btn)
+        self._delete_btn = QPushButton("Delete All Data")
+        self._delete_btn.setObjectName("danger-button")
+        self._delete_btn.clicked.connect(self._on_delete_all)
+        data_layout.addWidget(self._delete_btn)
 
         layout.addWidget(data_card)
 
@@ -295,3 +297,75 @@ class SettingsPage(QWidget):
         config.blink_rate_threshold = self.blink_threshold_spin.value()
         config.rolling_window_minutes = self.rolling_window_spin.value()
         config.sustained_low_blink_seconds = self.sustained_low_spin.value()
+
+    def _on_export(self) -> None:
+        """Export all data as JSON."""
+        import json
+        from datetime import datetime
+
+        from PySide6.QtWidgets import QFileDialog, QMessageBox
+
+        if self.deps.analytics_service is None:
+            QMessageBox.warning(
+                self,
+                "Export",
+                "Analytics service not available.",
+            )
+            return
+
+        data = self.deps.analytics_service.export_all_data()
+
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Export Data",
+            f"eye_health_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
+            "JSON Files (*.json)",
+        )
+
+        if file_path:
+            try:
+                with open(file_path, "w", encoding="utf-8") as f:
+                    json.dump(data, f, indent=2, ensure_ascii=False)
+                QMessageBox.information(
+                    self,
+                    "Export Complete",
+                    f"Data exported to:\n{file_path}\n\n"
+                    f"Timer sessions: {len(data.get('timer_sessions', []))}\n"
+                    f"Monitoring sessions: {len(data.get('monitoring_sessions', []))}\n"
+                    f"Blink measurements: {len(data.get('blink_measurements', []))}",
+                )
+            except Exception as e:
+                QMessageBox.critical(
+                    self,
+                    "Export Error",
+                    f"Failed to export data:\n{e}",
+                )
+
+    def _on_delete_all(self) -> None:
+        """Delete all data with confirmation."""
+        from PySide6.QtWidgets import QMessageBox
+
+        if self.deps.analytics_service is None:
+            return
+
+        reply = QMessageBox.warning(
+            self,
+            "Delete All Data",
+            "This will permanently delete:\n\n"
+            "- All timer sessions\n"
+            "- All monitoring sessions\n"
+            "- All blink measurements\n"
+            "- All statistics history\n\n"
+            "This action cannot be undone.\n\n"
+            "Are you sure you want to delete all data?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+
+        if reply == QMessageBox.StandardButton.Yes:
+            count = self.deps.analytics_service.delete_all_data()
+            QMessageBox.information(
+                self,
+                "Data Deleted",
+                f"Successfully deleted {count} records.",
+            )

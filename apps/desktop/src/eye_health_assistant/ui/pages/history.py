@@ -1,4 +1,4 @@
-"""History page — session log and past activity."""
+"""History page — session log with filtering and data management."""
 
 from __future__ import annotations
 
@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QPushButton,
+    QScrollArea,
     QSizePolicy,
     QVBoxLayout,
     QWidget,
@@ -75,10 +76,6 @@ class SessionCard(QFrame):
         info_layout.addLayout(detail_row)
 
         layout.addLayout(info_layout, 1)
-
-        delete_btn = QPushButton("Delete")
-        delete_btn.setObjectName("danger-button")
-        layout.addWidget(delete_btn)
 
 
 class MonitoringSessionCard(QFrame):
@@ -153,24 +150,26 @@ class MonitoringSessionCard(QFrame):
 
         layout.addLayout(info_layout, 1)
 
-        delete_btn = QPushButton("Delete")
-        delete_btn.setObjectName("danger-button")
-        layout.addWidget(delete_btn)
-
 
 class HistoryPage(QWidget):
-    """Session history page."""
+    """Session history page with filtering."""
 
     def __init__(self, deps: Dependencies, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self.deps = deps
         self._session_list_layout: QVBoxLayout | None = None
         self._empty_state: QFrame | None = None
+        self._current_filter = "all"
         self._build_ui()
         self._load_sessions()
 
     def _build_ui(self) -> None:
-        layout = QVBoxLayout(self)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+
+        content = QWidget()
+        layout = QVBoxLayout(content)
         layout.setContentsMargins(36, 28, 36, 28)
         layout.setSpacing(28)
 
@@ -180,15 +179,20 @@ class HistoryPage(QWidget):
         header.addWidget(title)
         header.addStretch()
 
-        clear_btn = QPushButton("Clear All")
-        clear_btn.setObjectName("danger-button")
-        header.addWidget(clear_btn)
+        # Filter buttons
+        filter_layout = QHBoxLayout()
+        filter_layout.setSpacing(10)
+        for label in ["All", "Timer", "Smart Mode"]:
+            btn = QPushButton(label)
+            btn.setObjectName("secondary-button")
+            filter_type = label.lower().replace(" ", "_")
+            btn.clicked.connect(
+                lambda _checked, f=filter_type: self._on_filter(f)
+            )
+            filter_layout.addWidget(btn)
+        header.addLayout(filter_layout)
 
         layout.addLayout(header)
-
-        subtitle = QLabel("Past monitoring sessions and activity log.")
-        subtitle.setObjectName("subtitle")
-        layout.addWidget(subtitle)
 
         # Session list container
         self._session_list = QFrame()
@@ -224,22 +228,21 @@ class HistoryPage(QWidget):
 
         layout.addStretch()
 
+        scroll.setWidget(content)
+
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.addWidget(scroll)
+
+    def _on_filter(self, filter_type: str) -> None:
+        """Handle filter button click."""
+        self._current_filter = filter_type
+        self._load_sessions()
+
     def _load_sessions(self) -> None:
-        """Load sessions from the database."""
+        """Load sessions from the database with current filter."""
         if self.deps.session_repository is None:
             return
-
-        sessions = self.deps.session_repository.get_recent(limit=50)
-
-        # Get monitoring sessions
-        monitoring_sessions = []
-        if self.deps.monitoring_repository is not None:
-            try:
-                monitoring_sessions = (
-                    self.deps.monitoring_repository.get_recent_sessions(limit=20)
-                )
-            except Exception:
-                monitoring_sessions = []
 
         # Clear existing cards
         if self._session_list_layout:
@@ -250,31 +253,45 @@ class HistoryPage(QWidget):
                     if widget is not None:
                         widget.setParent(None)
 
-        # Add monitoring sessions
-        for ms in monitoring_sessions:
-            if ms.started_at:
-                started_at = ms.started_at.strftime("%Y-%m-%d %H:%M")
-            else:
-                started_at = "Unknown"
-            monitoring_card = MonitoringSessionCard(
-                _session_id=cast(str, ms.id),
-                _device_index=cast(int, ms.device_index),
-                started_at=started_at,
-                duration=cast(float | None, ms.duration_seconds),
-                total_blinks=cast(int | None, ms.total_blinks),
-                avg_rate=cast(float | None, ms.average_blink_rate),
-                status=cast(str, ms.status),
-            )
-            if self._session_list_layout:
-                self._session_list_layout.addWidget(monitoring_card)
+        has_sessions = False
 
-        # Add timer sessions
-        for session in sessions:
-            timer_card = SessionCard(session)
-            if self._session_list_layout:
-                self._session_list_layout.addWidget(timer_card)
+        # Timer sessions
+        if self._current_filter in ("all", "timer"):
+            sessions = self.deps.session_repository.get_recent(limit=50)
+            for session in sessions:
+                timer_card = SessionCard(session)
+                if self._session_list_layout:
+                    self._session_list_layout.addWidget(timer_card)
+                has_sessions = True
 
-        has_sessions = bool(sessions or monitoring_sessions)
+        # Monitoring sessions
+        if self._current_filter in ("all", "smart_mode"):
+            monitoring_sessions = []
+            if self.deps.monitoring_repository is not None:
+                try:
+                    monitoring_sessions = (
+                        self.deps.monitoring_repository.get_recent_sessions(limit=20)
+                    )
+                except Exception:
+                    monitoring_sessions = []
+
+            for ms in monitoring_sessions:
+                if ms.started_at:
+                    started_at = ms.started_at.strftime("%Y-%m-%d %H:%M")
+                else:
+                    started_at = "Unknown"
+                monitoring_card = MonitoringSessionCard(
+                    _session_id=cast(str, ms.id),
+                    _device_index=cast(int, ms.device_index),
+                    started_at=started_at,
+                    duration=cast(float | None, ms.duration_seconds),
+                    total_blinks=cast(int | None, ms.total_blinks),
+                    avg_rate=cast(float | None, ms.average_blink_rate),
+                    status=cast(str, ms.status),
+                )
+                if self._session_list_layout:
+                    self._session_list_layout.addWidget(monitoring_card)
+                has_sessions = True
 
         if has_sessions:
             if self._session_list:

@@ -68,6 +68,7 @@ class DashboardPage(QWidget):
         self._current_blink_rate: float | None = None
         self._build_ui()
         self._connect_signals()
+        self._load_historical_data()
 
     def _build_ui(self) -> None:
         layout = QVBoxLayout(self)
@@ -141,7 +142,7 @@ class DashboardPage(QWidget):
         actions_layout.addStretch()
         layout.addLayout(actions_layout)
 
-        # Recent activity placeholder
+        # Recent activity card
         activity_card = QFrame()
         activity_card.setObjectName("card")
         activity_card.setFrameShape(QFrame.Shape.NoFrame)
@@ -254,6 +255,30 @@ class DashboardPage(QWidget):
         service.blink_rate_updated.connect(self._on_blink_rate_updated)
         service.error_occurred.connect(self._on_error_occurred)
 
+    def _load_historical_data(self) -> None:
+        """Load today's historical data from analytics service."""
+        if self.deps.analytics_service is None:
+            return
+
+        summary = self.deps.analytics_service.get_today_summary()
+
+        # Update screen time
+        self._screen_time_card.update_value(
+            summary.focus_hours_display,
+            "Today"
+        )
+
+        # Update breaks
+        self._breaks_card.update_value(
+            str(summary.focus_sessions_completed),
+            "Today"
+        )
+
+        # Update blink rate if available
+        blink_rate = summary.blink_rate_display
+        if blink_rate != "--":
+            self._blink_rate_card.update_value(blink_rate, "Today")
+
     @Slot()
     def _toggle_monitoring(self) -> None:
         """Start or stop smart monitoring."""
@@ -290,6 +315,8 @@ class DashboardPage(QWidget):
         self._start_btn.setText("Start Smart Mode")
         self._status_card.update_value("Inactive", "Camera off")
         self._blink_rate_card.update_value("--", "Enable Smart Mode")
+        # Refresh historical data
+        self._load_historical_data()
 
     @Slot(bool)
     def _on_face_state_changed(self, detected: bool) -> None:
