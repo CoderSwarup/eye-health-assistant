@@ -1,4 +1,4 @@
-"""Exercises page — catalog with filtering and detail navigation."""
+"""Exercises page — catalog with filtering, detail, and player navigation."""
 
 from __future__ import annotations
 
@@ -25,6 +25,7 @@ from eye_health_assistant.content.loader import (
 from eye_health_assistant.core.result import Err
 from eye_health_assistant.domain.models.exercise import Exercise
 from eye_health_assistant.ui.pages.exercise_detail import ExerciseDetailPage
+from eye_health_assistant.ui.pages.exercise_player import ExercisePlayerPage
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +86,7 @@ class ExerciseCard(QFrame):
 
 
 class ExercisesPage(QWidget):
-    """Exercise catalog with category filtering and list/detail views."""
+    """Exercise catalog with category filtering and list/detail/player views."""
 
     def __init__(self, deps: Dependencies, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -93,6 +94,7 @@ class ExercisesPage(QWidget):
         self._stack = QStackedWidget()
         self._list_index = 0
         self._detail_index = 1
+        self._player_index = 2
         self._all_exercises: list[Exercise] = []
         self._current_category: str | None = None
         self._grid_layout: QGridLayout | None = None
@@ -103,7 +105,7 @@ class ExercisesPage(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
-        # List view
+        # ── List view ──
         list_widget = QWidget()
         self._list_layout = QVBoxLayout(list_widget)
         self._list_layout.setContentsMargins(36, 28, 36, 28)
@@ -147,10 +149,15 @@ class ExercisesPage(QWidget):
         self._stack.addWidget(list_widget)
         self._list_index = 0
 
-        # Detail placeholder
+        # ── Detail placeholder ──
         detail_placeholder = QWidget()
         self._stack.addWidget(detail_placeholder)
         self._detail_index = 1
+
+        # ── Player placeholder ──
+        player_placeholder = QWidget()
+        self._stack.addWidget(player_placeholder)
+        self._player_index = 2
 
         layout.addWidget(self._stack)
 
@@ -206,6 +213,7 @@ class ExercisesPage(QWidget):
         """Show the detail view for an exercise."""
         detail = ExerciseDetailPage(exercise)
         detail.back_clicked.connect(self._show_list)
+        detail.start_clicked.connect(lambda e=exercise: self._start_exercise(e))
 
         old = self._stack.widget(self._detail_index)
         if old is not None:
@@ -213,6 +221,17 @@ class ExercisesPage(QWidget):
             old.deleteLater()
         self._stack.insertWidget(self._detail_index, detail)
         self._stack.setCurrentIndex(self._detail_index)
+
+    def _start_exercise(self, exercise: Exercise) -> None:
+        """Show the exercise player for the given exercise."""
+        player = ExercisePlayerPage(exercise, parent=self)
+        old = self._stack.widget(self._player_index)
+        if old is not None:
+            self._stack.removeWidget(old)
+            old.deleteLater()
+        self._stack.insertWidget(self._player_index, player)
+        self._stack.setCurrentIndex(self._player_index)
+        player.start_exercise()
 
     def _show_list(self) -> None:
         """Return to the list view."""

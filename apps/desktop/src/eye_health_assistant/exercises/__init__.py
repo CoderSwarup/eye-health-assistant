@@ -1,3 +1,11 @@
-"""Exercise catalog and management."""
+"""Exercise catalog and controller package."""
 
-__all__: list[str] = []
+from eye_health_assistant.exercises.controller import (
+    ExerciseController,
+    ExerciseState,
+)
+
+__all__ = [
+    "ExerciseController",
+    "ExerciseState",
+]

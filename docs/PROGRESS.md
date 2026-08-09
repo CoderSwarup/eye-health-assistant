@@ -125,12 +125,19 @@ PRD. Last updated: 2026-08-09
 | 1 | Exercise catalog           | Done — 6 exercises          |
 | 2 | Exercise card UI           | Done — ExerciseCard widget  |
 | 3 | Exercise detail screen     | Done — ExerciseDetailPage    |
-| 4 | Exercise animations        | Not started                 |
+| 4 | Exercise animations        | Done — engine + controller + player |
 | 5 | Exercise content (JSON)    | Done — content/exercises/   |
 | 6 | Eye Care / Learning Center | Done — 8 articles           |
 | 7 | Eye Care detail screen     | Done — ArticleDetailPage     |
 | 8 | Eye Care content (JSON)    | Done — content/eye_care/    |
 | 9 | Content loader             | Done — content/loader.py + validation |
+
+**Exercise animations completed this session:**
+- Animation engine: `BlinkAnimation`, `LookAwayAnimation`, `NearFarAnimation` with QTimer-based 60fps rendering
+- Exercise controller: State machine (READY → COUNTDOWN → RUNNING → PAUSED → COMPLETED/CANCELLED)
+- Exercise player page: Full UI with countdown overlay, instruction display, progress bar, pause/resume/end controls
+- Tests: 24 new tests for controller and animation factory, all passing
+- Quality: ruff clean, mypy clean, 151/151 tests passing
 
 ---
 
@@ -235,12 +242,12 @@ PRD. Last updated: 2026-08-09
 | Phase 2 — Desktop UI  | 6      | 6      | 0           | 0           |
 | Phase 3 — Timer Mode  | 8      | 7      | 0           | 1           |
 | Phase 4 — Camera Mode | 11     | 11     | 0           | 0           |
-| Phase 5 — Exercises   | 9      | 8      | 0           | 1           |
+| Phase 5 — Exercises   | 9      | 9      | 0           | 0           |
 | Phase 6 — Analytics   | 11     | 4      | 0           | 7           |
 | Phase 7 — Hardening   | 13     | 3      | 0           | 10          |
 | Phase 8 — Packaging   | 10     | 5      | 0           | 5           |
 | Phase 9 — Website     | 12     | 11     | 0           | 1           |
-| **Total**             | **93** | **69** | **0**       | **24**      |
+| **Total**             | **93** | **70** | **0**       | **23**      |
 
 ---
 
@@ -286,8 +293,11 @@ CURRENT STATE:
   - Statistics page shows blink rate statistics
   - History page shows monitoring sessions alongside timer sessions
   - Note: Automatic blink detection requires MediaPipe (unavailable on Python 3.14); uses research-based estimation
-- Phase 5: Partially done — exercises catalog, exercise cards, eye care articles done
-  - Remaining: exercise detail, eye care detail, JSON content, animations, content loader
+- Phase 5: Complete — exercises catalog, cards, detail page, animations, player, eye care articles
+  - Animation engine with BlinkAnimation, LookAwayAnimation, NearFarAnimation
+  - ExerciseController state machine with countdown, pause, resume, cancel
+  - Exercise player page with full UI controls
+  - 24 new tests for controller and animation factory
 - Phase 6: Partially done — statistics page, history page, period toggles done
   - Remaining: charts engine, statistics engine, insights, score calculation, export/delete
 - Phase 7: Partially done — Result type, exceptions, logging, UI states for all screens
@@ -312,11 +322,11 @@ WEB STYLING RULES (CRITICAL):
 5. Inter font via next/font/google
 
 WHAT TO WORK ON NEXT (priority order):
-1. Exercise/Eye Care detail screens and JSON content
-2. Website: Roadmap section
-3. Charts engine and statistics engine
-4. Database migrations
-5. Packaging: macOS .dmg, Windows .exe installer, release workflow
+1. Website: Roadmap section
+2. Charts engine and statistics engine
+3. Database migrations
+4. Packaging: macOS .dmg, Windows .exe installer, release workflow
+5. Accessibility and performance optimization
 
 PRIVACY RULES (NON-NEGOTIABLE):
 - Never persist webcam frames

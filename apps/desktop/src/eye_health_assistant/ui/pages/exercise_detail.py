@@ -22,6 +22,7 @@ class ExerciseDetailPage(QWidget):
     """Full detail view for a single exercise."""
 
     back_clicked = Signal()
+    start_clicked = Signal(object)
 
     def __init__(self, exercise: Exercise, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -40,7 +41,7 @@ class ExerciseDetailPage(QWidget):
         content = QWidget()
         layout = QVBoxLayout(content)
         layout.setContentsMargins(36, 28, 36, 28)
-        layout.setSpacing(28)
+        layout.setSpacing(24)
 
         # Back button
         back_btn = QPushButton("← Back")
@@ -193,6 +194,7 @@ class ExerciseDetailPage(QWidget):
 
         # Start button
         start_btn = QPushButton("Start Exercise")
+        start_btn.clicked.connect(lambda: self.start_clicked.emit(self.exercise))
         layout.addWidget(start_btn)
 
         layout.addStretch()
