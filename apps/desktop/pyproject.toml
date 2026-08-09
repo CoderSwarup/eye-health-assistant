@@ -57,6 +57,7 @@ where = ["src"]
 [tool.setuptools.package-data]
 eye_health_assistant = [
     "resources/**/*",
+    "content/**/*.json",
 ]
 
 [tool.ruff]

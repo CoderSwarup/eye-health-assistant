@@ -201,6 +201,10 @@ jobs:
         working-directory: apps/desktop
         run: pyinstaller EyeHealthAssistant.spec --noconfirm --clean
 
+      - name: 📁 Debug - list dist contents
+        run: |
+          Get-ChildItem -Path "apps/desktop/dist/EyeHealthAssistant" -Recurse -File | Select-Object FullName
+
       - name: 🔍 Verify build
         run: |
           $exec = "apps/desktop/dist/EyeHealthAssistant/EyeHealthAssistant.exe"

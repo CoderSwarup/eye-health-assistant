@@ -17,14 +17,20 @@ SPEC_DIR = os.path.dirname(os.path.abspath(SPEC))
 SRC_DIR = os.path.join(SPEC_DIR, 'src')
 CONTENT_DIR = os.path.join(SRC_DIR, 'eye_health_assistant', 'content')
 
+# Verify content exists
+exercises_path = os.path.join(CONTENT_DIR, 'exercises', 'exercises.json')
+eyecare_path = os.path.join(CONTENT_DIR, 'eye_care', 'eye_care.json')
+if not os.path.exists(exercises_path):
+    raise FileNotFoundError(f"Exercises content not found: {exercises_path}")
+if not os.path.exists(eyecare_path):
+    raise FileNotFoundError(f"Eye care content not found: {eyecare_path}")
+
 # Collect data files
 datas = [
     # Exercise content
-    (os.path.join(CONTENT_DIR, 'exercises', 'exercises.json'),
-     os.path.join('eye_health_assistant', 'content', 'exercises')),
+    (exercises_path, os.path.join('eye_health_assistant', 'content', 'exercises')),
     # Eye care content
-    (os.path.join(CONTENT_DIR, 'eye_care', 'eye_care.json'),
-     os.path.join('eye_health_assistant', 'content', 'eye_care')),
+    (eyecare_path, os.path.join('eye_health_assistant', 'content', 'eye_care')),
 ]
 
 # Hidden imports for PySide6 and dependencies
