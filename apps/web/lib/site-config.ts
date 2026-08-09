@@ -13,8 +13,8 @@ export const siteConfig = {
     changelog: 'https://github.com/CoderSwarup/eye-health-assistant/blob/main/docs/CHANGELOG.md',
   },
   download: {
-    windows: process.env.NEXT_PUBLIC_DOWNLOAD_WINDOWS_URL || '#',
-    macos: process.env.NEXT_PUBLIC_DOWNLOAD_MACOS_URL || '#',
+    windows: process.env.NEXT_PUBLIC_DOWNLOAD_WINDOWS_URL || 'https://github.com/CoderSwarup/eye-health-assistant/releases/download/v1.0.0/Eye-Health-Assistant-Windows-v1.0.0.zip',
+    macos: process.env.NEXT_PUBLIC_DOWNLOAD_MACOS_URL || 'https://github.com/CoderSwarup/eye-health-assistant/releases/download/v1.0.0/Eye-Health-Assistant-macOS-v1.0.0.dmg',
   },
   platforms: {
     windows: 'Windows 10/11',

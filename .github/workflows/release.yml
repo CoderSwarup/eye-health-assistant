@@ -266,10 +266,27 @@ jobs:
           name: windows-zip
           path: artifacts/
 
-      - name: 📋 List artifacts
+      - name: 📋 Extract release files
         run: |
-          echo "Artifacts downloaded:"
-          ls -la artifacts/
+          # Extract DMG from the artifact zip
+          cd artifacts
+          unzip -o macos-dmg.zip -d macos/ 2>/dev/null || true
+          # The DMG is inside the zip
+          DMG=$(find macos -name "*.dmg" | head -1)
+          if [ -n "$DMG" ]; then
+            cp "$DMG" .
+            echo "DMG found: $DMG"
+          fi
+          # Windows zip is already the right format
+          unzip -o windows-zip.zip -d windows/ 2>/dev/null || true
+          # Repackage windows folder as zip
+          if [ -d "windows/EyeHealthAssistant" ]; then
+            cd windows
+            zip -r ../Eye-Health-Assistant-Windows-v${{ needs.validate.outputs.version }}.zip EyeHealthAssistant/
+            cd ..
+          fi
+          ls -la *.dmg *.zip 2>/dev/null || echo "Files:"
+          ls -la
 
       - name: 📝 Generate release notes
         id: notes
@@ -338,7 +355,7 @@ jobs:
           prerelease: false
           files: |
             artifacts/*.dmg
-            artifacts/*.zip
+            artifacts/Eye-Health-Assistant-Windows-*.zip
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

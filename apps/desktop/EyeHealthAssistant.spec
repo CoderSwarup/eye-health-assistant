@@ -42,7 +42,6 @@ hiddenimports = [
     'sqlalchemy.ext.baked',
     'numpy',
     'numpy.core',
-    'numpy.core._methods',
     'numpy.lib',
     'numpy.lib.format',
     'numpy.random',
@@ -125,8 +124,8 @@ app = BUNDLE(
     bundle_identifier='com.eyehealthassistant.desktop',
     info_plist={
         'CFBundleDisplayName': 'Eye Health Assistant',
-        'CFBundleShortVersionString': '0.1.0',
-        'CFBundleVersion': '0.1.0',
+        'CFBundleShortVersionString': '1.0.0',
+        'CFBundleVersion': '1.0.0',
         'NSHumanReadableCopyright': 'Copyright (c) 2026 Eye Health Assistant Contributors. MIT License.',
         'NSCameraUsageDescription': 'Eye Health Assistant uses the camera to estimate blink rate for eye wellness monitoring. Camera data is processed locally and never stored or uploaded.',
         'NSHighResolutionCapable': True,
