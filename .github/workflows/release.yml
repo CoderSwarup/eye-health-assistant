@@ -3,10 +3,10 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 env:
-  PYTHON_VERSION: '3.13'
+  PYTHON_VERSION: "3.13"
 
 jobs:
   # ─────────────────────────────────────────────
@@ -212,12 +212,12 @@ jobs:
             Write-Error "ERROR: Executable not found"
             exit 1
           }
-          $exercises = "apps/desktop/dist/EyeHealthAssistant/eye_health_assistant/content/exercises/exercises.json"
+          $exercises = "apps/desktop/dist/EyeHealthAssistant/_internal/eye_health_assistant/content/exercises/exercises.json"
           if (!(Test-Path $exercises)) {
             Write-Error "ERROR: Exercise content not bundled"
             exit 1
           }
-          $eyecare = "apps/desktop/dist/EyeHealthAssistant/eye_health_assistant/content/eye_care/eye_care.json"
+          $eyecare = "apps/desktop/dist/EyeHealthAssistant/_internal/eye_health_assistant/content/eye_care/eye_care.json"
           if (!(Test-Path $eyecare)) {
             Write-Error "ERROR: Eye care content not bundled"
             exit 1
