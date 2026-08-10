@@ -226,12 +226,12 @@ jobs:
 
       - name: 📁 Create ZIP archive
         run: |
-          VERSION="${{ needs.validate.outputs.version }}"
-          ZIP_NAME="Eye-Health-Assistant-Windows-v${VERSION}.zip"
+          $VERSION = "${{ needs.validate.outputs.version }}"
+          $ZIP_NAME = "Eye-Health-Assistant-Windows-v${VERSION}.zip"
 
           Compress-Archive -Path "apps/desktop/dist/EyeHealthAssistant/*" -DestinationPath "apps/desktop/dist/$ZIP_NAME"
 
-          echo "ZIP created: apps/desktop/dist/$ZIP_NAME"
+          Write-Output "ZIP created: apps/desktop/dist/$ZIP_NAME"
           Get-Item "apps/desktop/dist/$ZIP_NAME" | Select-Object Name, Length
 
       - name: 📤 Upload ZIP artifact
