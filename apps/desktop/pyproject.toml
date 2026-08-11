@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "eye-health-assistant"
-version = "0.1.0"
+version = "1.0.0"
 description = "A privacy-first desktop application for healthier screen-use habits"
 readme = "README.md"
 license = {text = "MIT"}
@@ -42,6 +42,7 @@ dev = [
     "mypy>=1.7.0",
     "ruff>=0.1.0",
     "pre-commit>=3.6.0",
+    "pyinstaller>=6.0.0",
 ]
 
 [project.scripts]
@@ -56,6 +57,7 @@ where = ["src"]
 [tool.setuptools.package-data]
 eye_health_assistant = [
     "resources/**/*",
+    "content/**/*.json",
 ]
 
 [tool.ruff]

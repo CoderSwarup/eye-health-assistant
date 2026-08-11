@@ -1,3 +1,5 @@
 """Notification service and policies."""
 
-__all__: list[str] = []
+from eye_health_assistant.notifications.service import NotificationService
+
+__all__ = ["NotificationService"]

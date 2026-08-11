@@ -4,7 +4,7 @@ Instructions for AI coding agents working on Eye Health Assistant.
 
 ## First Rule
 
-Read `EYE_CARE_PRD.md` before making any architectural or product decision.
+Read `docs/EYE_CARE_PRD.md` before making any architectural or product decision.
 The PRD is the single source of truth. Never invent requirements that conflict
 with it.
 

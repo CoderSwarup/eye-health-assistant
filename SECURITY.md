@@ -1,39 +1,80 @@
 # Security Policy
 
-## Reporting a Vulnerability
+## Reporting Vulnerabilities
 
-If you discover a security vulnerability within this project, please send an email to the maintainers. All security vulnerabilities will be promptly addressed.
+If you discover a security vulnerability, please report it responsibly:
 
-## Privacy by Design
-
-This application is built with privacy as a core requirement:
-
-- **No cloud storage** for core application data
-- **No webcam uploads** - all camera processing happens locally
-- **No raw video recording** by default
-- **No account required** for normal use
-- **No API keys or secrets** stored in the application
-- **Local SQLite database** for all user data
-- **User-controlled data** with export and delete capabilities
+1. **Do not** open a public GitHub issue
+2. Email security@[your-domain].com (if available)
+3. Or create a private security advisory on GitHub
 
 ## Security Measures
 
-- Secure local file permissions
-- Safe database handling with parameterized queries
-- Input validation on all user-facing interfaces
-- Dependency vulnerability scanning in CI
-- No hardcoded secrets or credentials
-- Platform-appropriate application data directories
+### Data Privacy
 
-## Supported Versions
+- **Local-only storage**: All data stays on your device
+- **No cloud sync**: No accounts, no remote servers
+- **No telemetry**: No usage data is collected
+- **No tracking**: No analytics or tracking scripts
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
+### Camera Security
 
-## Data Handling
+- **In-memory processing only**: Webcam frames are never written to disk
+- **Explicit permission**: Camera access requires user consent
+- **Visual indicator**: Camera status always visible in UI
+- **No upload**: Camera data never leaves your device
 
-- Camera frames are processed in memory and never persisted by default
-- Database files use standard SQLite with appropriate file permissions
-- Export functionality writes to user-selected locations only
-- All user data can be deleted at any time through the application settings
+### Database Security
+
+- **SQLite**: Local database file only
+- **No remote access**: Database is not exposed over network
+- **Encryption**: Consider enabling SQLCipher for sensitive data (future)
+
+### Application Security
+
+- **Input validation**: All user inputs are validated
+- **Type safety**: TypeScript strict mode + Python type hints
+- **Dependency scanning**: Automated dependency updates via Dependabot
+- **Code signing**: Desktop app can be code-signed for distribution
+
+## Best Practices
+
+### For Users
+
+1. Keep the application updated
+2. Review camera permissions in your OS settings
+3. Regularly export and backup your data
+4. Report any suspicious behavior immediately
+
+### For Developers
+
+1. Never commit secrets or API keys
+2. Use environment variables for configuration
+3. Run security linters before committing
+4. Review dependencies for vulnerabilities
+
+## Data Retention
+
+- **Sessions**: Stored locally in SQLite database
+- **Settings**: Stored in local config file
+- **Logs**: Rotated and stored locally (5MB max, 3 backups)
+- **No cloud backups**: User must manually backup if desired
+
+## Compliance
+
+- **GDPR**: Local-only storage simplifies compliance
+- **CCPA**: No personal data collection
+- **HIPAA**: Not a medical device — no HIPAA requirements
+
+## Updates
+
+Security patches will be released as:
+- **Critical**: Immediate patch release
+- **High**: Next minor version
+- **Medium/Low**: Next major version
+
+## Contact
+
+For security inquiries:
+- GitHub Security Advisories
+- Email: [your-security-email]

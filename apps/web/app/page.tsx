@@ -10,6 +10,7 @@ import { Statistics } from '@/components/sections/Statistics';
 import { HowItWorks } from '@/components/sections/HowItWorks';
 import { EyeCare } from '@/components/sections/EyeCare';
 import { CrossPlatform } from '@/components/sections/CrossPlatform';
+import { Roadmap } from '@/components/sections/Roadmap';
 import { FAQ } from '@/components/sections/FAQ';
 import { DownloadCTA } from '@/components/sections/DownloadCTA';
 
@@ -28,6 +29,7 @@ export default function Home() {
         <HowItWorks />
         <EyeCare />
         <CrossPlatform />
+        <Roadmap />
         <FAQ />
         <DownloadCTA />
       </main>

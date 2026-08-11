@@ -1,3 +1,17 @@
-"""Camera infrastructure adapters."""
+"""Camera infrastructure — webcam access and management."""
 
-__all__: list[str] = []
+from eye_health_assistant.core.exceptions import (
+    CameraNotAvailableError,
+    CameraReadError,
+)
+from eye_health_assistant.infrastructure.camera.adapter import (
+    CameraAdapter,
+    OpenCVCamera,
+)
+
+__all__ = [
+    "CameraAdapter",
+    "CameraNotAvailableError",
+    "CameraReadError",
+    "OpenCVCamera",
+]

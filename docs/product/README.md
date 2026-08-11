@@ -10,4 +10,4 @@ This directory contains product-level documentation for Eye Health Assistant.
 - Release notes
 - Product roadmap details
 
-The main product requirements are in `EYE_CARE_PRD.md` at the repository root. This directory holds supporting product documents that are too detailed for the PRD.
+The main product requirements are in `docs/EYE_CARE_PRD.md`. This directory holds supporting product documents that are too detailed for the PRD.

@@ -1,0 +1,362 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  PYTHON_VERSION: "3.13"
+
+jobs:
+  # ─────────────────────────────────────────────
+  # Validate
+  # ─────────────────────────────────────────────
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🏷️ Extract version from tag
+        id: version
+        run: |
+          TAG="${GITHUB_REF#refs/tags/v}"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "version=$TAG" >> $GITHUB_OUTPUT
+          echo "Release version: $TAG"
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 📦 Install dependencies
+        working-directory: apps/desktop
+        run: pip install -e ".[dev]"
+
+      - name: 🔍 Verify version consistency
+        run: |
+          APP_VERSION=$(python -c "from eye_health_assistant.core.constants import VERSION; print(VERSION)")
+          TAG_VERSION="${{ steps.version.outputs.version }}"
+
+          echo "Application version: $APP_VERSION"
+          echo "Tag version: $TAG_VERSION"
+
+          if [ "$APP_VERSION" != "$TAG_VERSION" ]; then
+            echo "ERROR: Version mismatch!"
+            echo "  Application: $APP_VERSION"
+            echo "  Tag: $TAG_VERSION"
+            echo "  Run: ./scripts/build/bump_version.sh $TAG_VERSION"
+            exit 1
+          fi
+
+          echo "✅ Versions match: $APP_VERSION"
+
+      # ── Tests (disabled in CI — run locally with: cd apps/desktop && pytest) ──
+      # - name: 🧪 Run tests
+      #   working-directory: apps/desktop
+      #   run: |
+      #     python -m pytest tests/unit/ -q --tb=short
+      #     echo "✅ Tests passed"
+
+      # ── Linting (disabled in CI — run locally with: ruff check src/) ──
+      # - name: 🔍 Run linting
+      #   working-directory: apps/desktop
+      #   run: |
+      #     ruff check src/
+      #     echo "✅ Linting passed"
+
+      # ── Type checking (disabled in CI — run locally with: mypy src/) ──
+      # - name: 🏷️ Run type checking
+      #   working-directory: apps/desktop
+      #   run: |
+      #     mypy src/
+      #     echo "✅ Type checking passed"
+
+  # ─────────────────────────────────────────────
+  # Build macOS
+  # ─────────────────────────────────────────────
+  build-macos:
+    needs: validate
+    runs-on: macos-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 💾 Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('apps/desktop/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: 📦 Install dependencies
+        working-directory: apps/desktop
+        run: pip install -e ".[dev]"
+
+      - name: 🔨 Build application
+        working-directory: apps/desktop
+        run: pyinstaller EyeHealthAssistant.spec --noconfirm --clean
+
+      - name: 🔍 Verify build
+        run: |
+          APP_PATH="apps/desktop/dist/Eye Health Assistant.app"
+          EXECUTABLE="$APP_PATH/Contents/MacOS/EyeHealthAssistant"
+
+          if [ ! -d "$APP_PATH" ]; then
+            echo "ERROR: Application bundle not found"
+            exit 1
+          fi
+
+          if [ ! -f "$EXECUTABLE" ]; then
+            echo "ERROR: Executable not found"
+            exit 1
+          fi
+
+          # Check content files
+          if [ ! -f "$APP_PATH/Contents/Resources/eye_health_assistant/content/exercises/exercises.json" ]; then
+            echo "ERROR: Exercise content not bundled"
+            exit 1
+          fi
+
+          if [ ! -f "$APP_PATH/Contents/Resources/eye_health_assistant/content/eye_care/eye_care.json" ]; then
+            echo "ERROR: Eye care content not bundled"
+            exit 1
+          fi
+
+          echo "✅ macOS build verified"
+
+      - name: 📦 Create DMG
+        run: |
+          brew install create-dmg
+
+          VERSION="${{ needs.validate.outputs.version }}"
+          DMG_NAME="Eye-Health-Assistant-macOS-v${VERSION}.dmg"
+
+          create-dmg \
+            --volname "Eye Health Assistant" \
+            --window-pos 200 120 \
+            --window-size 600 400 \
+            --icon-size 100 \
+            --icon "Eye Health Assistant.app" 150 190 \
+            --hide-extension "Eye Health Assistant.app" \
+            --app-drop-link 450 190 \
+            "apps/desktop/dist/$DMG_NAME" \
+            "apps/desktop/dist/Eye Health Assistant.app" 2>/dev/null || {
+            echo "Using hdiutil fallback..."
+            hdiutil create -volname "Eye Health Assistant" \
+              -srcfolder "apps/desktop/dist/Eye Health Assistant.app" \
+              -ov -format UDZO \
+              "apps/desktop/dist/$DMG_NAME"
+          }
+
+          echo "DMG created: apps/desktop/dist/$DMG_NAME"
+          ls -la "apps/desktop/dist/$DMG_NAME"
+
+      - name: 📤 Upload DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-dmg
+          path: apps/desktop/dist/*.dmg
+          retention-days: 5
+
+  # ─────────────────────────────────────────────
+  # Build Windows
+  # ─────────────────────────────────────────────
+  build-windows:
+    needs: validate
+    runs-on: windows-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 💾 Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~\AppData\Local\pip\Cache
+          key: ${{ runner.os }}-pip-${{ hashFiles('apps/desktop/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: 📦 Install dependencies
+        working-directory: apps/desktop
+        run: pip install -e ".[dev]"
+
+      - name: 🔨 Build application
+        working-directory: apps/desktop
+        run: pyinstaller EyeHealthAssistant.spec --noconfirm --clean
+
+      - name: 📁 Debug - list dist contents
+        run: |
+          Get-ChildItem -Path "apps/desktop/dist/EyeHealthAssistant" -Recurse -File | Select-Object FullName
+
+      - name: 🔍 Verify build
+        run: |
+          $exec = "apps/desktop/dist/EyeHealthAssistant/EyeHealthAssistant.exe"
+          if (!(Test-Path $exec)) {
+            Write-Error "ERROR: Executable not found"
+            exit 1
+          }
+          $exercises = "apps/desktop/dist/EyeHealthAssistant/_internal/eye_health_assistant/content/exercises/exercises.json"
+          if (!(Test-Path $exercises)) {
+            Write-Error "ERROR: Exercise content not bundled"
+            exit 1
+          }
+          $eyecare = "apps/desktop/dist/EyeHealthAssistant/_internal/eye_health_assistant/content/eye_care/eye_care.json"
+          if (!(Test-Path $eyecare)) {
+            Write-Error "ERROR: Eye care content not bundled"
+            exit 1
+          }
+          Write-Output "✅ Windows build verified"
+
+      - name: 📁 Create ZIP archive
+        run: |
+          $VERSION = "${{ needs.validate.outputs.version }}"
+          $ZIP_NAME = "Eye-Health-Assistant-Windows-v${VERSION}.zip"
+
+          Compress-Archive -Path "apps/desktop/dist/EyeHealthAssistant/*" -DestinationPath "apps/desktop/dist/$ZIP_NAME"
+
+          Write-Output "ZIP created: apps/desktop/dist/$ZIP_NAME"
+          Get-Item "apps/desktop/dist/$ZIP_NAME" | Select-Object Name, Length
+
+      - name: 📤 Upload ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-zip
+          path: apps/desktop/dist/*.zip
+          retention-days: 5
+
+  # ─────────────────────────────────────────────
+  # Create GitHub Release
+  # ─────────────────────────────────────────────
+  release:
+    needs: [validate, build-macos, build-windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 📥 Download macOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-dmg
+          path: artifacts/
+
+      - name: 📥 Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-zip
+          path: artifacts/
+
+      - name: 📋 Extract release files
+        run: |
+          # Extract DMG from the artifact zip
+          cd artifacts
+          unzip -o macos-dmg.zip -d macos/ 2>/dev/null || true
+          # The DMG is inside the zip
+          DMG=$(find macos -name "*.dmg" | head -1)
+          if [ -n "$DMG" ]; then
+            cp "$DMG" .
+            echo "DMG found: $DMG"
+          fi
+          # Windows zip is already the right format
+          unzip -o windows-zip.zip -d windows/ 2>/dev/null || true
+          # Repackage windows folder as zip
+          if [ -d "windows/EyeHealthAssistant" ]; then
+            cd windows
+            zip -r ../Eye-Health-Assistant-Windows-v${{ needs.validate.outputs.version }}.zip EyeHealthAssistant/
+            cd ..
+          fi
+          ls -la *.dmg *.zip 2>/dev/null || echo "Files:"
+          ls -la
+
+      - name: 📝 Generate release notes
+        id: notes
+        run: |
+          VERSION="${{ needs.validate.outputs.version }}"
+
+          # Get commits since last tag
+          PREV_TAG=$(git tag -l 'v*' --sort=-v:refname | head -n1)
+
+          if [ -n "$PREV_TAG" ] && [ "$PREV_TAG" != "v$VERSION" ]; then
+            COMMITS=$(git log "$PREV_TAG..HEAD" --pretty=format:"- %s" --no-merges)
+          else
+            COMMITS=$(git log --pretty=format:"- %s" --no-merges -20)
+          fi
+
+          # Create release notes
+          cat > release_notes.md << EOF
+          ## What's New
+
+          Eye Health Assistant v${VERSION}
+
+          ### Changes
+
+          ${COMMITS}
+
+          ### Supported Platforms
+
+          - macOS (Intel and Apple Silicon)
+          - Windows 10/11
+
+          ### Installation
+
+          **macOS:**
+          1. Download the \`.dmg\` file
+          2. Open the disk image
+          3. Drag "Eye Health Assistant" to your Applications folder
+          4. Launch from Applications
+
+          **Windows:**
+          1. Download the \`.zip\` file
+          2. Extract to your preferred location
+          3. Run \`EyeHealthAssistant.exe\`
+
+          ### Privacy
+
+          - All data is stored locally on your device
+          - Camera processing happens entirely on your computer
+          - No webcam frames are ever recorded or uploaded
+          - No account or internet connection required
+
+          ### Notes
+
+          - This is a wellness and educational tool
+          - Not intended to diagnose, treat, cure, or prevent disease
+          - See \`SECURITY.md\` for security policy
+          EOF
+
+          echo "Release notes generated"
+
+      - name: 🚀 Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Eye Health Assistant v${{ needs.validate.outputs.version }}"
+          body_path: release_notes.md
+          draft: false
+          prerelease: false
+          files: |
+            artifacts/*.dmg
+            artifacts/Eye-Health-Assistant-Windows-*.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

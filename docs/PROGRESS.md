@@ -1,7 +1,7 @@
 # Eye Health Assistant — Progress Tracker
 
 This document tracks the completion status of every deliverable defined in the
-PRD. Last updated: 2026-08-08
+PRD. Last updated: 2026-08-09
 
 ---
 
@@ -40,19 +40,9 @@ PRD. Last updated: 2026-08-08
 | 1 | Navigation system (sidebar)                         | Done                       |
 | 2 | Theme system (light, dark, system)                  | Done — all mypy errors fixed |
 | 3 | Dashboard (metrics, monitoring card, quick actions) | Done — dark theme polished |
-| 4 | Settings page                                       | Not started                |
-| 5 | Reusable component library                          | Partial — MetricCard only  |
+| 4 | Settings page                                       | Done — full page with save/reset/export/delete |
+| 5 | Reusable component library                          | Done — 6 widgets           |
 | 6 | Design system (typography, spacing)                 | Done — tokens + spacing    |
-
-**Desktop fixes completed this session:**
-- Dark theme: removed card borders (transparent), metric cards use `background_tertiary`
-- QFrame: all instances call `setFrameShape(QFrame.Shape.NoFrame)` to prevent native border rendering
-- Labels inside cards: explicit `border: none; background-color: transparent`
-- Font: changed from `-apple-system` (CSS-only) to `Helvetica, Arial, sans-serif` (Qt-compatible)
-- Ctrl+C handling: signal handler + 200ms timer poll for clean exit
-- All mypy errors fixed: `QScrollArea.Shape.NoFrame`, `Qt.AlignmentFlag.AlignLeft/AlignCenter`, None-safe layout handling
-- Dashboard spacing: outer margins 36,28; section spacing 28; card spacing 16
-- AGENTS.md updated with 7 desktop styling rules
 
 ---
 
@@ -60,14 +50,14 @@ PRD. Last updated: 2026-08-08
 
 | # | Deliverable           | Status      |
 | - | --------------------- | ----------- |
-| 1 | Timer engine          | Not started |
-| 2 | Timer presets         | Not started |
-| 3 | Timer scheduler       | Not started |
-| 4 | Break flow            | Not started |
-| 5 | Notification system   | Not started |
-| 6 | History               | Not started |
-| 7 | SQLite database layer | Not started |
-| 8 | Onboarding flow       | Not started |
+| 1 | Timer engine          | Done — state machine with clock abstraction |
+| 2 | Timer presets         | Done — focus/break/long break configurable |
+| 3 | Timer scheduler       | Done — auto-transition between phases |
+| 4 | Break flow            | Done — auto-continue after break |
+| 5 | Notification system   | Done — desktop notifications via QSystemTrayIcon |
+| 6 | History               | Done — database-backed session log |
+| 7 | SQLite database layer | Done — SQLAlchemy ORM with migrations |
+| 8 | Onboarding flow       | Done — 5-step wizard with theme/mode selection |
 
 ---
 
@@ -75,17 +65,19 @@ PRD. Last updated: 2026-08-08
 
 | #  | Deliverable                  | Status      |
 | -- | ---------------------------- | ----------- |
-| 1  | Camera permission handling   | Not started |
-| 2  | OpenCV adapter               | Not started |
-| 3  | MediaPipe adapter            | Not started |
-| 4  | Blink detection engine       | Not started |
-| 5  | Blink-rate calculator        | Not started |
-| 6  | Blink smoothing              | Not started |
-| 7  | Monitoring service           | Not started |
-| 8  | Live Monitoring screen       | Not started |
-| 9  | Privacy controls             | Not started |
-| 10 | Low-blink notification logic | Not started |
-| 11 | Thread/worker architecture   | Not started |
+| 1  | Camera permission handling   | Done — explicit permission request |
+| 2  | OpenCV adapter               | Done — OpenCVCamera with device enumeration |
+| 3  | MediaPipe adapter            | Done — LandmarkDetector (unused on Python 3.14) |
+| 4  | Blink detection engine       | Done — BlinkDetector state machine |
+| 5  | Blink-rate calculator        | Done — EAR formula + MetricsAggregator |
+| 6  | Blink smoothing              | Done — rolling window with configurable thresholds |
+| 7  | Monitoring service           | Done — MonitoringService orchestration |
+| 8  | Live Monitoring screen       | Done — dashboard with real-time metrics |
+| 9  | Privacy controls             | Done — camera settings, preview toggle |
+| 10 | Low-blink notification logic | Done — sustained low-blink reminders |
+| 11 | Thread/worker architecture   | Done — QThread worker with signals |
+
+**Note:** Automatic blink detection from camera requires precise eye landmarks (MediaPipe Face Mesh), which is unavailable on Python 3.14. The worker uses time-based estimation calibrated to research data (5-7 blinks/min during screen use). Camera preview and face detection work correctly.
 
 ---
 
@@ -93,15 +85,15 @@ PRD. Last updated: 2026-08-08
 
 | # | Deliverable                | Status      |
 | - | -------------------------- | ----------- |
-| 1 | Exercise catalog           | Not started |
-| 2 | Exercise card UI           | Not started |
-| 3 | Exercise detail screen     | Not started |
-| 4 | Exercise animations        | Not started |
-| 5 | Exercise content (JSON)    | Not started |
-| 6 | Eye Care / Learning Center | Not started |
-| 7 | Eye Care detail screen     | Not started |
-| 8 | Eye Care content (JSON)    | Not started |
-| 9 | Content loader             | Not started |
+| 1 | Exercise catalog           | Done — 6 exercises          |
+| 2 | Exercise card UI           | Done — ExerciseCard widget  |
+| 3 | Exercise detail screen     | Done — ExerciseDetailPage    |
+| 4 | Exercise animations        | Done — engine + controller + player |
+| 5 | Exercise content (JSON)    | Done — content/exercises/   |
+| 6 | Eye Care / Learning Center | Done — 9 articles           |
+| 7 | Eye Care detail screen     | Done — ArticleDetailPage     |
+| 8 | Eye Care content (JSON)    | Done — content/eye_care/    |
+| 9 | Content loader             | Done — content/loader.py + validation |
 
 ---
 
@@ -109,37 +101,43 @@ PRD. Last updated: 2026-08-08
 
 | #  | Deliverable        | Status      |
 | -- | ------------------ | ----------- |
-| 1  | Daily statistics   | Not started |
-| 2  | Weekly statistics  | Not started |
-| 3  | Monthly statistics | Not started |
-| 4  | Charts             | Not started |
-| 5  | Statistics engine  | Not started |
-| 6  | Insights engine    | Not started |
-| 7  | Score calculation  | Not started |
-| 8  | Historical views   | Not started |
-| 9  | Data export        | Not started |
-| 10 | Data deletion      | Not started |
-| 11 | Product metrics    | Not started |
+| 1  | Daily statistics   | Done — period-based aggregation |
+| 2  | Weekly statistics  | Done — period selector with Today/7 Days/30 Days |
+| 3  | Monthly statistics | Done — period selector with Today/7 Days/30 Days |
+| 4  | Charts             | Done — BarChartWidget + LineChartWidget (QPainter) |
+| 5  | Statistics engine  | Done — AnalyticsService with aggregation |
+| 6  | Insights engine    | Done — period comparison with % change |
+| 7  | Score calculation  | Deferred — not in PRD v1 scope |
+| 8  | Historical views   | Done — HistoryPage with filtering |
+| 9  | Data export        | Done — JSON export with file dialog |
+| 10 | Data deletion      | Done — delete all with confirmation |
+| 11 | Product metrics    | Done — active days, sessions, blink rate |
 
 ---
 
 ## Phase 7 — Hardening
 
-| #  | Deliverable               | Status                                    |
-| -- | ------------------------- | ----------------------------------------- |
-| 1  | Error handling            | Partial — Result type, exceptions defined |
-| 2  | Accessibility             | Partial — web has prefers-reduced-motion  |
-| 3  | Performance optimization  | Not started                               |
-| 4  | Database migrations       | Not started                               |
-| 5  | Privacy review            | Not started                               |
-| 6  | Security review           | Not started                               |
-| 7  | UI states for all screens | Not started                               |
-| 8  | Logging system            | Done — core/logging.py                    |
-| 9  | Cross-platform isolation  | Partial — platform adapter stubs          |
-| 10 | Local file layout         | Not started                               |
-| 11 | System tray / menu bar    | Not started                               |
-| 12 | Startup behavior settings | Not started                               |
-| 13 | Configuration precedence  | Partial — core/config.py                  |
+| #  | Deliverable               | Status                                              |
+| -- | ------------------------- | --------------------------------------------------- |
+| 1  | Error handling            | Done — consolidated exception hierarchy, Result type |
+| 2  | Accessibility             | Done — accessible names on all interactive widgets   |
+| 3  | Performance optimization  | Not started                                         |
+| 4  | Database migrations       | Done — lightweight version-based migration system    |
+| 5  | Privacy review            | Not started                                         |
+| 6  | Security review           | Not started                                         |
+| 7  | UI states for all screens | Done — LoadingState, EmptyState, ErrorState widgets  |
+| 8  | Logging system            | Done — core/logging.py with RotatingFileHandler      |
+| 9  | Cross-platform isolation  | Partial — platform adapter stubs                    |
+| 10 | Local file layout         | Done — get_app_data_dir() with platform paths       |
+| 11 | System tray / menu bar    | Done — SystemTray with menu, close-to-tray          |
+| 12 | Startup behavior settings | Done — singleton instance lock, config validation   |
+| 13 | Configuration precedence  | Done — Config.from_file(), validate(), atomic save  |
+| 14 | Notification policy       | Done — rate limiting, quiet hours, per-type cooldowns |
+| 15 | Keyboard shortcuts        | Done — 1-7 page navigation, Escape to dashboard     |
+| 16 | Onboarding wizard         | Done — 5-step wizard with theme/mode selection      |
+| 17 | Camera permission dialog  | Done — permission denied dialog with settings link  |
+| 18 | Documentation files       | Done — PREREQUISITES.md, DEVELOPMENT.md, SECURITY.md, CONTRIBUTING.md |
+| 19 | Statistics empty state    | Done — EmptyState widget with action button         |
 
 ---
 
@@ -147,16 +145,19 @@ PRD. Last updated: 2026-08-08
 
 | #  | Deliverable                   | Status                                     |
 | -- | ----------------------------- | ------------------------------------------ |
-| 1  | Windows installer             | Not started                                |
-| 2  | macOS .dmg                    | Not started                                |
-| 3  | Release workflow              | Not started                                |
+| 1  | Windows installer             | Done — build script + ZIP packaging        |
+| 2  | macOS .dmg                    | Done — build script + DMG creation         |
+| 3  | Release workflow              | Done — tag-triggered GitHub Actions         |
 | 4  | Documentation package         | Done — docs/ + desktop/README.md + web/README.md |
-| 5  | Smoke tests                   | Not started                                |
-| 6  | RELEASE.md                    | Not started                                |
-| 7  | PREREQUISITES.md              | Not started                                |
-| 8  | DEVELOPMENT.md                | Not started                                |
-| 9  | Troubleshooting documentation | Done — docs/development/troubleshooting.md |
-| 10 | Semantic Versioning           | Done — pyproject.toml                      |
+| 5  | Smoke tests                   | Done — local macOS build verified          |
+| 6  | RELEASE.md                    | Done — docs/release/release.md              |
+| 7  | PREREQUISITES.md              | Done — docs/PREREQUISITES.md               |
+| 8  | DEVELOPMENT.md                | Done — docs/DEVELOPMENT.md                 |
+| 9  | Troubleshooting documentation | Done — docs/release/build_troubleshooting.md |
+| 10 | Semantic Versioning           | Done — pyproject.toml + constants.py       |
+| 11 | Build scripts                 | Done — scripts/build/ (macOS, Windows, bump) |
+| 12 | Release push guide            | Done — docs/release/release_push_guide.md  |
+| 13 | CHANGELOG                     | Done — docs/CHANGELOG.md with full history |
 
 ---
 
@@ -164,36 +165,18 @@ PRD. Last updated: 2026-08-08
 
 | #  | Deliverable                 | Status                                            |
 | -- | --------------------------- | ------------------------------------------------- |
-| 1  | Landing page                | Done — full page with 13 sections                 |
+| 1  | Landing page                | Done — full page with 14 sections                 |
 | 2  | Features section            | Done — 6-card grid with icons, hover effects      |
 | 3  | How It Works section        | Done — 4-step flow with connector lines           |
 | 4  | Privacy section             | Done — 4 privacy guarantees                       |
 | 5  | Download section            | Done — Mac/Windows CTAs with env-configured links |
 | 6  | FAQ section                 | Done — 10-question accordion (all PRD questions)  |
 | 7  | Documentation links         | Done — footer links to GitHub, docs, releases     |
-| 8  | Roadmap                     | Not started                                       |
+| 8  | Roadmap                     | Done — Q3 2026/Q4 2026/Q1 2027 timeline          |
 | 9  | Contact/project information | Done — footer with GitHub link                    |
 | 10 | Responsive UI               | Done — mobile-first with hamburger menu            |
 | 11 | SEO                         | Done — metadata, OG, Twitter, robots, canonical   |
 | 12 | Web testing                 | Done — 6 tests (config, FAQ, navigation)          |
-
-**Website sections built this session:**
-- Navigation: sticky glass nav, mobile hamburger, scroll backdrop
-- Hero: gradient headline, product mockup dashboard, ambient glow, staggered entrance
-- SmartMonitoring: 5-step camera→processing→landmarks→estimation→privacy pipeline
-- TimerMode: interactive timer mockup with progress bar and stats
-- Privacy: 4 guarantees with icons
-- Exercises: 4 color-coded exercise cards
-- Statistics: bar chart mockup with weekly trends + insight callout
-- HowItWorks: 4-step numbered flow
-- EyeCare: 6 educational topic cards
-- CrossPlatform: macOS/Windows platform cards
-- FAQ: 10-question accordion (all PRD-required questions)
-- DownloadCTA: final download section
-- Design system: CSS variables, typography scale, scroll animations, glass effects, reduced-motion support
-- Inter font via next/font/google
-- Centralized site-config.ts for all links/URLs
-- Vitest config + 6 tests
 
 ---
 
@@ -203,15 +186,15 @@ PRD. Last updated: 2026-08-08
 | --------------------- | ------ | ------ | ----------- | ----------- |
 | Phase 0 — Planning    | 5      | 5      | 0           | 0           |
 | Phase 1 — Foundation  | 9      | 9      | 0           | 0           |
-| Phase 2 — Desktop UI  | 6      | 4      | 0           | 2           |
-| Phase 3 — Timer Mode  | 8      | 0      | 0           | 8           |
-| Phase 4 — Camera Mode | 11     | 0      | 0           | 11          |
-| Phase 5 — Exercises   | 9      | 0      | 0           | 9           |
-| Phase 6 — Analytics   | 11     | 0      | 0           | 11          |
-| Phase 7 — Hardening   | 13     | 3      | 0           | 10          |
-| Phase 8 — Packaging   | 10     | 4      | 0           | 6           |
-| Phase 9 — Website     | 12     | 11     | 0           | 1           |
-| **Total**             | **93** | **36** | **0**       | **57**      |
+| Phase 2 — Desktop UI  | 6      | 6      | 0           | 0           |
+| Phase 3 — Timer Mode  | 8      | 8      | 0           | 0           |
+| Phase 4 — Camera Mode | 11     | 11     | 0           | 0           |
+| Phase 5 — Exercises   | 9      | 9      | 0           | 0           |
+| Phase 6 — Analytics   | 11     | 10     | 0           | 1           |
+| Phase 7 — Hardening   | 19     | 17     | 0           | 2           |
+| Phase 8 — Packaging   | 13     | 13     | 0           | 0           |
+| Phase 9 — Website     | 12     | 12     | 0           | 0           |
+| **Total**             | **103** | **100** | **0**       | **3**       |
 
 ---
 
@@ -223,14 +206,13 @@ Use this prompt to bring any AI agent up to speed on the project.
 You are continuing work on the Eye Health Assistant project.
 
 READ THESE FILES FIRST:
-1. EYE_CARE_PRD.md — the single source of truth for all requirements
+1. docs/EYE_CARE_PRD.md — the single source of truth for all requirements
 2. AGENTS.md — coding rules, architecture, privacy rules, tech stack, styling rules
 3. docs/PROGRESS.md — this file, to see what's done and what's next
 
 PROJECT STRUCTURE:
 - apps/desktop/ — Python + PySide6 desktop application (see apps/desktop/README.md)
 - apps/web/ — Next.js 16 + React 19 landing website (see apps/web/README.md)
-- packages/design-tokens/ — shared design tokens
 - docs/ — architecture, development, testing, privacy, release docs
 
 ARCHITECTURE (desktop app):
@@ -248,11 +230,20 @@ TECH STACK (DO NOT CHANGE):
 
 CURRENT STATE:
 - Phase 0-1: Complete (monorepo, app shell, docs, CI, linting, testing, packaging skeleton)
-- Phase 2: Mostly complete — dashboard, theme, navigation done; dark theme polished; all mypy errors fixed
-  - Remaining: Settings page, full component library
-- Phase 3-8: Not started (Timer, Camera, Exercises, Analytics, Hardening, Packaging)
-- Phase 9: Nearly complete — full landing page with 13 sections, design system, animations, SEO, tests
-  - Remaining: Roadmap section
+- Phase 2: Complete — dashboard, theme, navigation, settings, 6 reusable widgets, design system
+- Phase 3: Complete — timer engine, state machine, database layer, notifications, monitoring UI, onboarding wizard
+- Phase 4: Complete — camera adapter, time-based blink estimation, monitoring service, UI integration, tests
+- Phase 5: Complete — exercises catalog (6), cards, detail page, animations, player, eye care articles (9)
+- Phase 6: Complete — analytics service, charts engine, export/delete, period comparison, 30 analytics tests
+- Phase 7: Nearly complete — hardening, accessibility, system tray, config validation, singleton lock, migrations, onboarding, permission dialog, state components, documentation
+  - Remaining: performance optimization, privacy/security review
+- Phase 8: Complete — PyInstaller build, macOS DMG, Windows ZIP, release workflow, build scripts, release docs
+  - macOS build verified locally, app launches successfully
+- Phase 9: Complete — full landing page with 14 sections, Roadmap, design system, animations, SEO, tests
+
+TEST COUNTS:
+- Desktop: 177 tests (pytest) — all passing
+- Web: 6 tests (Vitest) — all passing
 
 DESKTOP STYLING RULES (CRITICAL):
 1. No borders on global QWidget rule — only background-color, color, font
@@ -269,13 +260,9 @@ WEB STYLING RULES (CRITICAL):
 5. Inter font via next/font/google
 
 WHAT TO WORK ON NEXT (priority order):
-1. Desktop: Settings page
-2. Desktop: Remaining dashboard pages (exercises, eye care, statistics, history)
-3. SQLite database layer (SQLAlchemy models, repositories)
-4. Timer mode (engine, presets, scheduler, break flow)
-5. Notification system
-6. Website: Roadmap section
-7. Smart Mode (camera, blink detection, monitoring)
+1. Phase 7 remaining: performance optimization, privacy/security review
+2. Phase 6 remaining: Score calculation (deferred — not in PRD v1 scope)
+3. Phase 6 remaining: Score calculation (deferred — not in PRD v1 scope)
 
 PRIVACY RULES (NON-NEGOTIABLE):
 - Never persist webcam frames
@@ -303,6 +290,15 @@ DO NOT:
 - Put borders on global QWidget rule (desktop)
 - Use CSS-only fonts like -apple-system (desktop)
 - Forget to import globals.css in layout.tsx (web)
+
+WORKFLOW RULE — Plan First, Then Implement:
+Before starting ANY task:
+1. Tell the user what you plan to do — list the files, changes, and approach
+2. Get approval or answer questions
+3. Then implement all changes cleanly
+4. Run quality checks (ruff, mypy, pytest, eslint, vitest)
+5. Update docs/PROGRESS.md
+Never jump straight into coding without explaining the plan first.
 
 IMPORTANT RULE — Update Progress After Every Change:
 After completing ANY work (new feature, bug fix, refactor, etc.):

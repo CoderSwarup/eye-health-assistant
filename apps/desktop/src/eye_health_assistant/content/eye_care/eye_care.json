@@ -1,0 +1,409 @@
+[
+  {
+    "id": "eye-care-20-20-20",
+    "slug": "20-20-20-rule",
+    "title": "The 20-20-20 Rule",
+    "summary": "A simple technique to reduce eye strain during extended screen use.",
+    "category": "Screen Habits",
+    "tags": ["screen-use", "breaks", "eye-strain"],
+    "reading_time_minutes": 3,
+    "difficulty": "Beginner",
+    "featured": true,
+    "order": 1,
+    "sections": [
+      {
+        "title": "What is the 20-20-20 rule?",
+        "content": "Every 20 minutes, look at something at least 20 feet (6 meters) away for at least 20 seconds. This gives your eye muscles a chance to relax from the constant near-focus required by screens.",
+        "type": "text"
+      },
+      {
+        "title": "Why it matters",
+        "content": "When you focus on a screen, your ciliary muscles stay contracted for long periods. This sustained effort can lead to discomfort, headaches, and blurred vision. Regular distance viewing helps these muscles relax naturally.",
+        "type": "text"
+      },
+      {
+        "title": "How to practice it",
+        "content": "1. Set a timer for 20 minutes\n2. When it提醒s you, look away from your screen\n3. Find an object at least 20 feet away — a window view, a wall clock, or anything across the room\n4. Focus on that object for at least 20 seconds\n5. Blink naturally while doing this\n6. Return to your screen",
+        "type": "list"
+      },
+      {
+        "title": "Common mistakes",
+        "content": "- Looking at something too close (less than 20 feet)\n- Rushing through the 20 seconds\n- Forgetting to blink during the break\n- Only doing it when eyes already hurt",
+        "type": "list"
+      }
+    ],
+    "quick_tips": [
+      "Set a recurring timer every 20 minutes",
+      "Choose a fixed focal point across the room",
+      "Blink naturally during each break",
+      "Use browser extensions that remind you"
+    ],
+    "related_exercises": ["guided-visual-break", "distance-viewing"],
+    "sources": [
+      {
+        "title": "Computer Vision Syndrome",
+        "organization": "American Academy of Ophthalmology",
+        "url": "https://www.aao.org/eye-health/tips-prevention/computer-vision-syndrome",
+        "published_at": "2024-01-01"
+      }
+    ],
+    "disclaimer": "This content is for general educational and wellness purposes and is not a medical diagnosis or substitute for professional eye care.",
+    "content_version": "1.0",
+    "updated_at": "2026-08-08"
+  },
+  {
+    "id": "eye-care-healthy-blinking",
+    "slug": "healthy-blinking-habits",
+    "title": "Healthy Blinking Habits",
+    "summary": "Why blinking frequency drops during screen use and how to maintain healthy blink rates.",
+    "category": "Blinking",
+    "tags": ["blinking", "dry-eyes", "screen-use"],
+    "reading_time_minutes": 4,
+    "difficulty": "Beginner",
+    "featured": true,
+    "order": 2,
+    "sections": [
+      {
+        "title": "How blinking works",
+        "content": "Most people blink 15 to 20 times per minute. Each blink spreads a thin layer of tears across the eye surface, keeping it moist and clear. When you focus on a screen, your blink rate can drop to 5 to 7 times per minute.",
+        "type": "text"
+      },
+      {
+        "title": "Why screen use reduces blinking",
+        "content": "Concentration on digital content naturally suppresses the blink reflex. The smaller the screen and the closer the viewing distance, the more pronounced this effect tends to be. Extended periods without adequate blinking can leave eyes feeling dry and tired.",
+        "type": "text"
+      },
+      {
+        "title": "Practical steps",
+        "content": "1. Be conscious of your blink rate while working\n2. Practice deliberate full blinks every few minutes\n3. If your eyes feel dry, close them gently for 5 seconds\n4. Keep artificial tears nearby if recommended by your eye-care professional\n5. Position your screen slightly below eye level to reduce exposed eye surface",
+        "type": "list"
+      }
+    ],
+    "quick_tips": [
+      "Conscious blinking helps but does not need to be exaggerated",
+      "Full blinks are more effective than partial ones",
+      "Dry environments make this more important",
+      "If dryness persists, consult an eye-care professional"
+    ],
+    "related_exercises": ["gentle-blinking", "relaxed-blink-routine"],
+    "sources": [
+      {
+        "title": "Dry Eye and Digital Screen Use",
+        "organization": "National Eye Institute",
+        "url": "https://www.nei.nih.gov/learn-about-eye-health/eye-conditions/dry-eye",
+        "published_at": "2024-01-01"
+      }
+    ],
+    "disclaimer": "This content is for general educational and wellness purposes and is not a medical diagnosis or substitute for professional eye care.",
+    "content_version": "1.0",
+    "updated_at": "2026-08-08"
+  },
+  {
+    "id": "eye-care-screen-distance",
+    "slug": "screen-distance-viewing-comfort",
+    "title": "Screen Distance and Viewing Comfort",
+    "summary": "How monitor distance and angle affect your eyes and what adjustments help.",
+    "category": "Screen Position",
+    "tags": ["ergonomics", "screen-distance", "workspace"],
+    "reading_time_minutes": 3,
+    "difficulty": "Beginner",
+    "featured": false,
+    "order": 3,
+    "sections": [
+      {
+        "title": "Recommended distance",
+        "content": "Position your monitor at arm's length, roughly 50 to 70 cm (20 to 28 inches) from your eyes. This distance reduces the effort your eyes need to focus on the screen content.",
+        "type": "text"
+      },
+      {
+        "title": "Screen angle",
+        "content": "Tilt your monitor slightly backward (10 to 20 degrees) and position the top of the screen at or slightly below eye level. This reduces neck strain and helps maintain a natural viewing angle.",
+        "type": "text"
+      },
+      {
+        "title": "Adjustments that help",
+        "content": "1. Measure your arm length and adjust monitor distance accordingly\n2. Use a monitor stand or adjustable arm if needed\n3. For laptops, consider an external monitor or laptop stand\n4. Adjust font size rather than leaning closer to the screen\n5. Re-check your setup periodically throughout the day",
+        "type": "list"
+      }
+    ],
+    "quick_tips": [
+      "Arm's length is a good starting distance",
+      "Top of screen at or below eye level",
+      "Adjust font size instead of moving closer",
+      "Use a stand for laptops"
+    ],
+    "related_exercises": ["near-to-far-focus", "guided-visual-break"],
+    "sources": [],
+    "disclaimer": "This content is for general educational and wellness purposes and is not a medical diagnosis or substitute for professional eye care.",
+    "content_version": "1.0",
+    "updated_at": "2026-08-08"
+  },
+  {
+    "id": "eye-care-workspace-lighting",
+    "slug": "workspace-lighting",
+    "title": "Workspace Lighting for Eye Comfort",
+    "summary": "How ambient lighting and screen brightness interact to affect eye comfort.",
+    "category": "Lighting",
+    "tags": ["lighting", "glare", "workspace", "ergonomics"],
+    "reading_time_minutes": 4,
+    "difficulty": "Beginner",
+    "featured": false,
+    "order": 4,
+    "sections": [
+      {
+        "title": "The lighting balance",
+        "content": "Your screen brightness should roughly match the ambient light around you. Working in a dark room with a bright screen, or in bright sunlight with a dim screen, forces your eyes to work harder to adapt.",
+        "type": "text"
+      },
+      {
+        "title": "Reducing glare",
+        "content": "Glare from windows or overhead lights can cause you to squint or lean forward. Position your screen perpendicular to windows rather than facing them or having a window behind you.",
+        "type": "text"
+      },
+      {
+        "title": "Practical adjustments",
+        "content": "1. Set screen brightness to match your surroundings\n2. Use blinds or curtains to control natural light\n3. Position your monitor away from direct light sources\n4. Consider a desk lamp with adjustable brightness for evening work\n5. Use the night light or warm display setting in the evening",
+        "type": "list"
+      }
+    ],
+    "quick_tips": [
+      "Screen brightness should match ambient light",
+      "Position windows to the side, not behind or in front",
+      "Use warm display settings in the evening",
+      "Anti-glare screens can help in bright environments"
+    ],
+    "related_exercises": ["short-visual-rest", "guided-visual-break"],
+    "sources": [],
+    "disclaimer": "This content is for general educational and wellness purposes and is not a medical diagnosis or substitute for professional eye care.",
+    "content_version": "1.0",
+    "updated_at": "2026-08-08"
+  },
+  {
+    "id": "eye-care-screen-breaks",
+    "slug": "regular-screen-breaks",
+    "title": "Why Regular Screen Breaks Matter",
+    "summary": "The physiological reasons breaks help and how to build sustainable break habits.",
+    "category": "Breaks",
+    "tags": ["breaks", "screen-use", "habits"],
+    "reading_time_minutes": 3,
+    "difficulty": "Beginner",
+    "featured": true,
+    "order": 5,
+    "sections": [
+      {
+        "title": "What happens during extended screen use",
+        "content": "When you stare at a screen for long periods, several things happen: your blink rate decreases, your ciliary muscles stay contracted, your posture often deteriorates, and your eyes receive less varied visual stimulation. These factors combine to cause discomfort over time.",
+        "type": "text"
+      },
+      {
+        "title": "How breaks help",
+        "content": "Short, regular breaks allow your eye muscles to relax, your blink rate to recover, and your posture to reset. Even a 20-second break every 20 minutes can make a meaningful difference in comfort over a work day.",
+        "type": "text"
+      },
+      {
+        "title": "Building the habit",
+        "content": "1. Use a timer or app to remind you at regular intervals\n2. Stand up and look around during breaks\n3. Combine screen breaks with light stretching\n4. Make breaks a non-negotiable part of your workflow\n5. Track your break consistency if it helps you stay accountable",
+        "type": "list"
+      }
+    ],
+    "quick_tips": [
+      "Short, frequent breaks are better than occasional long ones",
+      "Combine breaks with standing or stretching",
+      "Timer apps can help build the habit",
+      "Breaks benefit both your eyes and your posture"
+    ],
+    "related_exercises": ["guided-visual-break", "short-visual-rest"],
+    "sources": [
+      {
+        "title": "Take Screen Breaks to Protect Your Eyes",
+        "organization": "American Academy of Ophthalmology",
+        "url": "https://www.aao.org/eye-health/tips-prevention/computer-vision-syndrome",
+        "published_at": "2024-01-01"
+      }
+    ],
+    "disclaimer": "This content is for general educational and wellness purposes and is not a medical diagnosis or substitute for professional eye care.",
+    "content_version": "1.0",
+    "updated_at": "2026-08-08"
+  },
+  {
+    "id": "eye-care-digital-eye-strain",
+    "slug": "digital-eye-strain",
+    "title": "Understanding Digital Eye Strain",
+    "summary": "What digital eye strain is, what causes it, and what you can do about it.",
+    "category": "Screen Habits",
+    "tags": ["eye-strain", "screen-use", "symptoms"],
+    "reading_time_minutes": 4,
+    "difficulty": "Beginner",
+    "featured": false,
+    "order": 6,
+    "sections": [
+      {
+        "title": "What it is",
+        "content": "Digital eye strain, also called computer vision syndrome, refers to a group of symptoms that can occur after extended screen use. These may include dry eyes, blurred vision, headaches, and neck or shoulder discomfort.",
+        "type": "text"
+      },
+      {
+        "title": "What causes it",
+        "content": "Reduced blinking, sustained near-focus, glare, poor screen positioning, and uncorrected vision problems can all contribute. It is not caused by screen light itself damaging the eyes, but by the way we use screens.",
+        "type": "text"
+      },
+      {
+        "title": "What you can do",
+        "content": "1. Follow the 20-20-20 rule\n2. Blink consciously and fully\n3. Adjust your screen distance and brightness\n4. Take regular breaks\n5. If symptoms persist, consult an eye-care professional",
+        "type": "list"
+      }
+    ],
+    "quick_tips": [
+      "Most symptoms are temporary and improve with breaks",
+      "Persistent symptoms warrant professional advice",
+      "Ergonomic setup makes a significant difference",
+      "The condition is not caused by permanent eye damage"
+    ],
+    "related_exercises": ["guided-visual-break", "gentle-blinking", "near-to-far-focus"],
+    "sources": [
+      {
+        "title": "Computer Vision Syndrome",
+        "organization": "American Academy of Ophthalmology",
+        "url": "https://www.aao.org/eye-health/tips-prevention/computer-vision-syndrome",
+        "published_at": "2024-01-01"
+      }
+    ],
+    "disclaimer": "This content is for general educational and wellness purposes and is not a medical diagnosis or substitute for professional eye care.",
+    "content_version": "1.0",
+    "updated_at": "2026-08-08"
+  },
+  {
+    "id": "eye-care-focus-sessions",
+    "slug": "building-focus-sessions",
+    "title": "Building Better Focus Sessions",
+    "summary": "How to structure work sessions that protect your eyes while maintaining productivity.",
+    "category": "Screen Habits",
+    "tags": ["focus", "productivity", "breaks", "habits"],
+    "reading_time_minutes": 3,
+    "difficulty": "Beginner",
+    "featured": false,
+    "order": 7,
+    "sections": [
+      {
+        "title": "Structured focus",
+        "content": "Working in focused blocks with built-in breaks is more sustainable than trying to power through hours without pausing. A common approach is 25 minutes of focused work followed by a 5-minute break.",
+        "type": "text"
+      },
+      {
+        "title": "Combining focus with eye care",
+        "content": "Each break is an opportunity to look away from your screen, blink fully, and shift your focus to a distant object. This naturally integrates eye care into your workflow without adding extra steps.",
+        "type": "text"
+      },
+      {
+        "title": "Getting started",
+        "content": "1. Choose a focus duration (25 minutes is common)\n2. Set a timer\n3. Work without screen distractions\n4. When the timer sounds, take a real break — look away, stand up, move\n5. Return after 5 minutes and repeat",
+        "type": "list"
+      }
+    ],
+    "quick_tips": [
+      "25 minutes work + 5 minutes break is a common pattern",
+      "Breaks should involve looking away from the screen",
+      "Adjust durations to what works for you",
+      "Consistency matters more than perfection"
+    ],
+    "related_exercises": ["guided-visual-break", "distance-viewing"],
+    "sources": [],
+    "disclaimer": "This content is for general educational and wellness purposes and is not a medical diagnosis or substitute for professional eye care.",
+    "content_version": "1.0",
+    "updated_at": "2026-08-08"
+  },
+  {
+    "id": "eye-care-nutrition",
+    "slug": "nutrition-and-eye-health",
+    "title": "Nutrition and Eye Comfort",
+    "summary": "How dietary choices may support eye comfort during regular screen use.",
+    "category": "Wellness",
+    "tags": ["nutrition", "hydration", "wellness"],
+    "reading_time_minutes": 3,
+    "difficulty": "Beginner",
+    "featured": false,
+    "order": 8,
+    "sections": [
+      {
+        "title": "What helps",
+        "content": "A balanced diet rich in omega-3 fatty acids, vitamins A, C, and E, and minerals like zinc may support overall eye comfort. Foods like leafy greens, fish, citrus fruits, and nuts are commonly recommended.",
+        "type": "text"
+      },
+      {
+        "title": "Hydration matters",
+        "content": "Dehydration can reduce tear production, making dry eyes more likely. Drinking enough water throughout the day supports healthy tear films and overall comfort.",
+        "type": "text"
+      },
+      {
+        "title": "Practical steps",
+        "content": "1. Include leafy greens and colorful vegetables in your meals\n2. Eat fish or nuts several times a week if possible\n3. Keep water nearby and drink regularly\n4. Avoid excessive caffeine, which can contribute to dehydration\n5. For specific dietary advice, consult a healthcare professional",
+        "type": "list"
+      }
+    ],
+    "quick_tips": [
+      "Omega-3 fatty acids may support eye comfort",
+      "Stay hydrated throughout the day",
+      "A varied diet is more effective than any single supplement",
+      "Consult a professional for specific nutritional advice"
+    ],
+    "related_exercises": ["gentle-blinking"],
+    "sources": [
+      {
+        "title": "Nutrition and Eye Health",
+        "organization": "American Academy of Ophthalmology",
+        "url": "https://www.aao.org/eye-health/nutrition",
+        "published_at": "2024-01-01"
+      }
+    ],
+    "disclaimer": "This content is for general educational and wellness purposes and is not a medical diagnosis or substitute for professional eye care.",
+    "content_version": "1.0",
+    "updated_at": "2026-08-08"
+  },
+  {
+    "id": "eye-care-when-to-seek-help",
+    "slug": "when-to-see-eye-professional",
+    "title": "When to See an Eye-Care Professional",
+    "summary": "Signs that warrant professional evaluation versus habits that self-resolve.",
+    "category": "Guidance",
+    "tags": ["professional-care", "symptoms", "guidance"],
+    "reading_time_minutes": 3,
+    "difficulty": "Beginner",
+    "featured": false,
+    "order": 9,
+    "sections": [
+      {
+        "title": "When self-care is enough",
+        "content": "Mild, occasional discomfort that improves with breaks, blinking, and ergonomic adjustments is common and usually manageable with the habits described in this app. Most digital eye strain symptoms are temporary.",
+        "type": "text"
+      },
+      {
+        "title": "When to seek professional advice",
+        "content": "Consider scheduling an appointment with an eye-care professional if you experience: persistent dry eyes that do not improve, frequent headaches, blurred vision that does not clear with rest, difficulty focusing, or any sudden changes in vision.",
+        "type": "text"
+      },
+      {
+        "title": "What to expect",
+        "content": "An eye-care professional can evaluate your vision, check for underlying conditions, and provide personalized recommendations. Regular eye exams are recommended for all adults, even without symptoms.",
+        "type": "text"
+      }
+    ],
+    "quick_tips": [
+      "Most screen-related discomfort is temporary",
+      "Persistent symptoms deserve professional attention",
+      "Regular eye exams benefit everyone",
+      "This app is not a substitute for professional care"
+    ],
+    "related_exercises": [],
+    "sources": [
+      {
+        "title": "When to Get an Eye Exam",
+        "organization": "American Academy of Ophthalmology",
+        "url": "https://www.aao.org/eye-health/tips-prevention/eye-exam-frequency",
+        "published_at": "2024-01-01"
+      }
+    ],
+    "disclaimer": "This content is for general educational and wellness purposes and is not a medical diagnosis or substitute for professional eye care.",
+    "content_version": "1.0",
+    "updated_at": "2026-08-08"
+  }
+]

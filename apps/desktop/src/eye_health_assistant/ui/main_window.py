@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import logging
 
-from PySide6.QtCore import Qt, Slot
+from PySide6.QtCore import Qt, QUrl, Slot
+from PySide6.QtGui import QCloseEvent, QDesktopServices, QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QMainWindow,
@@ -16,7 +17,15 @@ from PySide6.QtWidgets import (
 
 from eye_health_assistant.app.dependencies import Dependencies
 from eye_health_assistant.ui.pages.dashboard import DashboardPage
+from eye_health_assistant.ui.pages.exercises import ExercisesPage
+from eye_health_assistant.ui.pages.eye_care import EyeCarePage
+from eye_health_assistant.ui.pages.history import HistoryPage
+from eye_health_assistant.ui.pages.monitoring import MonitoringPage
+from eye_health_assistant.ui.pages.onboarding import OnboardingPage
+from eye_health_assistant.ui.pages.settings import SettingsPage
+from eye_health_assistant.ui.pages.statistics import StatisticsPage
 from eye_health_assistant.ui.themes.manager import ThemeManager, ThemeMode
+from eye_health_assistant.ui.tray import SystemTray
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +37,7 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
         self.deps = deps
         self.theme_manager = ThemeManager(self)
+        self._tray: SystemTray | None = None
 
         self.setWindowTitle("Eye Health Assistant")
         self.setMinimumSize(1100, 700)
@@ -38,7 +48,15 @@ class MainWindow(QMainWindow):
 
         # Build UI
         self._build_ui()
-        self._navigate_to("dashboard")
+        self._setup_tray()
+        self._setup_keyboard_shortcuts()
+
+        # Show onboarding on first launch, otherwise show dashboard
+        if self.deps.config.onboarding_completed:
+            self._navigate_to("dashboard")
+        else:
+            self.sidebar.setVisible(False)
+            self._show_onboarding()
 
     def _build_ui(self) -> None:
         """Build the main UI layout."""
@@ -109,6 +127,7 @@ class MainWindow(QMainWindow):
             btn = QPushButton(label)
             btn.setObjectName("nav-button")
             btn.setCheckable(True)
+            btn.setAccessibleName(f"Navigate to {label}")
             btn.clicked.connect(lambda _checked, pid=page_id: self._navigate_to(pid))
             self.nav_buttons[page_id] = btn
             sidebar_layout.addWidget(btn)
@@ -118,14 +137,100 @@ class MainWindow(QMainWindow):
         # Theme toggle
         theme_btn = QPushButton("Toggle Theme")
         theme_btn.setObjectName("secondary-button")
+        theme_btn.setAccessibleName("Toggle between light and dark theme")
         theme_btn.clicked.connect(self._toggle_theme)
         sidebar_layout.addWidget(theme_btn)
 
+        # GitHub link
+        github_btn = QPushButton("GitHub")
+        github_btn.setObjectName("secondary-button")
+        github_btn.setAccessibleName("Open GitHub repository in browser")
+        github_btn.clicked.connect(
+            lambda: QDesktopServices.openUrl(
+                QUrl("https://github.com/CoderSwarup/eye-health-assistant")
+            )
+        )
+        sidebar_layout.addWidget(github_btn)
+
         return sidebar
+
+    def _setup_tray(self) -> None:
+        """Set up the system tray icon."""
+        if not SystemTray.isSystemTrayAvailable():
+            logger.info("System tray not available on this platform")
+            return
+
+        self._tray = SystemTray(deps=self.deps, parent=self)
+
+        # Connect tray signals
+        self._tray.show_window.connect(self._show_from_tray)
+        self._tray.start_timer.connect(self._start_timer_from_tray)
+        self._tray.start_smart_mode.connect(self._start_smart_from_tray)
+        self._tray.stop_smart_mode.connect(self._stop_smart_from_tray)
+        self._tray.open_exercises.connect(
+            lambda: self._navigate_to("exercises")
+        )
+        self._tray.open_settings.connect(
+            lambda: self._navigate_to("settings")
+        )
+        self._tray.quit_app.connect(self._quit_from_tray)
+
+        self._tray.show()
+        logger.info("System tray initialized")
+
+    def _setup_keyboard_shortcuts(self) -> None:
+        """Set up keyboard shortcuts for navigation and actions."""
+        # Page navigation shortcuts (1-7)
+        page_keys = [
+            ("1", "dashboard"),
+            ("2", "monitoring"),
+            ("3", "exercises"),
+            ("4", "eye_care"),
+            ("5", "statistics"),
+            ("6", "history"),
+            ("7", "settings"),
+        ]
+        for key, page_id in page_keys:
+            shortcut = QShortcut(QKeySequence(key), self)
+            shortcut.activated.connect(
+                lambda pid=page_id: self._navigate_to(pid)
+            )
+
+        # Escape to go back to dashboard
+        esc = QShortcut(QKeySequence(Qt.Key.Key_Escape), self)
+        esc.activated.connect(lambda: self._navigate_to("dashboard"))
+
+        # Set focus policies on sidebar buttons
+        for btn in self.nav_buttons.values():
+            btn.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
     def _create_pages(self) -> None:
         """Create all page instances."""
         self.pages["dashboard"] = DashboardPage(deps=self.deps)
+        dashboard = self.pages["dashboard"]
+        dashboard.navigate_to.connect(self._navigate_to)  # type: ignore[attr-defined]
+
+        if self.deps.timer_controller:
+            monitoring = MonitoringPage(
+                deps=self.deps,
+                timer_controller=self.deps.timer_controller,
+            )
+            self.pages["monitoring"] = monitoring
+
+        self.pages["exercises"] = ExercisesPage(deps=self.deps)
+        self.pages["eye_care"] = EyeCarePage(deps=self.deps)
+        self.pages["statistics"] = StatisticsPage(deps=self.deps)
+        self.pages["history"] = HistoryPage(deps=self.deps)
+        self.pages["settings"] = SettingsPage(deps=self.deps)
+
+        # Onboarding page (shown on first launch)
+        self._onboarding = OnboardingPage(deps=self.deps)
+        self._onboarding.completed.connect(self._on_onboarding_completed)
+
+    def _on_onboarding_completed(self) -> None:
+        """Handle onboarding completion — show dashboard and sidebar."""
+        self.sidebar.setVisible(True)
+        self._navigate_to("dashboard")
 
     def _navigate_to(self, page_id: str) -> None:
         """Navigate to a page by ID."""
@@ -154,6 +259,44 @@ class MainWindow(QMainWindow):
 
         self.page_layout.addWidget(page)
 
+    def _show_onboarding(self) -> None:
+        """Show the onboarding page (replaces content area, hides sidebar)."""
+        while self.page_layout.count():
+            item = self.page_layout.takeAt(0)
+            if item is not None:
+                widget = item.widget()
+                if widget is not None:
+                    widget.setParent(None)
+
+        self.page_layout.addWidget(self._onboarding)
+
+    def _show_from_tray(self) -> None:
+        """Show the window from tray."""
+        self.showNormal()
+        self.activateWindow()
+        self.raise_()
+
+    def _start_timer_from_tray(self) -> None:
+        """Start timer from tray menu."""
+        self._navigate_to("monitoring")
+        self._show_from_tray()
+
+    def _start_smart_from_tray(self) -> None:
+        """Start smart mode from tray menu."""
+        if self.deps.monitoring_service:
+            self.deps.monitoring_service.start()
+
+    def _stop_smart_from_tray(self) -> None:
+        """Stop smart mode from tray menu."""
+        if self.deps.monitoring_service:
+            self.deps.monitoring_service.stop()
+
+    def _quit_from_tray(self) -> None:
+        """Quit the application from tray menu."""
+        self.deps.shutdown()
+        from PySide6.QtWidgets import QApplication
+        QApplication.quit()
+
     @Slot()
     def _toggle_theme(self) -> None:
         """Toggle between light and dark themes."""
@@ -162,3 +305,11 @@ class MainWindow(QMainWindow):
             self.theme_manager.set_theme(ThemeMode.LIGHT)
         else:
             self.theme_manager.set_theme(ThemeMode.DARK)
+
+    def closeEvent(self, event: QCloseEvent) -> None:  # noqa: N802
+        """Handle window close - minimize to tray instead of quitting."""
+        if self._tray and self._tray.isVisible():
+            self.hide()
+            event.ignore()
+        else:
+            event.accept()
